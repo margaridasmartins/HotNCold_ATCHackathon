@@ -1,7 +1,7 @@
 import json
 
-def simple(price, start=0, end=744):
-    f = open("../../data/temperatureData.json")
+def simple(data_path, price, start=0, end=744):
+    f = open(data_path)
     data = json.loads(f.read())
     f.close()
   
@@ -40,4 +40,5 @@ def simple(price, start=0, end=744):
             data.append({'time':time, 'mode': 'COMFORT', 'c_score': 8, 'kwh': 0.8, 'total_c_score': c_score, 'total_kwh': kw, 'temp': t, 'total_cost':total_price})
 
     return data
+
 

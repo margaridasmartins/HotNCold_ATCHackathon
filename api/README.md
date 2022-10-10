@@ -18,5 +18,17 @@ pip install -r requirements.txt
 3. Running 
 ```
 cd src
-python -m gunicorn main:app -k uvicorn.workers.UvicornWorker
+python -m uvicorn main:app --reload
+```
+
+## Docker Instalation
+
+1. Build Image
+```
+sudo docker build -f Dockerfile -t api ..
+```
+
+2. Run Container
+```
+sudo docker run -p 8000:8000 api
 ```

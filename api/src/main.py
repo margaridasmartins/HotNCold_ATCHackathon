@@ -4,6 +4,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from typing import List
+import os
 
 from utils import create_response
 
@@ -14,6 +15,13 @@ logging.basicConfig(
     format="%(module)-20s:%(levelname)-15s| %(message)s",
     level=logging.INFO
 )
+
+# Seperate prod from dev
+env = os.getenv("ENV", "DEV")
+if env == "PROD":
+    data_path = "data/"
+else:
+    data_path = "../../data/"
 
 app = FastAPI()
 
@@ -43,8 +51,9 @@ def simple_request(
             Json response with the status code and data.
     """
     try:
+        temp_data = data_path + 'temperatureData.json'
         if type == "S":
-            return create_response(status_code=200, data=simple(price, start, end))
+            return create_response(status_code=200, data=simple(temp_data,price, start, end))
         elif type == "B":
             #TODO
             pass
