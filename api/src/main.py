@@ -1,14 +1,14 @@
-from datetime import date
-from fcntl import DN_DELETE
 import logging
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from typing import List
+import datetime
 import os
 
 from utils import create_response
 
 from simple import simple
+from data import get_prices
 
 # Logger
 logging.basicConfig(
@@ -27,24 +27,22 @@ app = FastAPI()
 
 @app.get("/api/v1/optimize")
 def simple_request(
-        price: float,
-        low_price: float = 0,
-        high_price: float = 0,
-        type: str = "S",
-        start: int = 0,
-        end: int = 744
+        start:  datetime.datetime,
+        end: datetime.datetime,
+        supplier: str,
+        tariff: str = "S",
     )-> JSONResponse:
     """
     Endpoint ``/optimize`` that accepts the method GET. Returns the best confort score / price ratio.
     Parameters:
-        type : `str`
-            The type of the energy pricing, can be S (simple), B (bi-hour) or T (tri-hour)
-        price : `List[float]`
-            The energy billing price is a list, with length 1 for S type, 2 for B and 3 for T.
-        start : `int`
-            index of first record to be considered (inclusive)
-        end : `int`
-            index of last record to be considered (exclusive)
+        start: `str`
+            The start datetime as string (inclusive)
+        end: `str`
+            The end datetime as string (exclusive)
+        supplier:
+            The name of the supplier
+        tariff: `str`
+            The corresponding tariff type. Available "S", "B", "T"
     Returns
     -------
         response : `JSONResponse`
@@ -52,17 +50,20 @@ def simple_request(
     """
     try:
         temp_data = data_path + 'temperatureData.json'
-        if type == "S":
-            return create_response(status_code=200, data=simple(temp_data,price, start, end))
-        elif type == "B":
+        prices = get_prices(supplier, tariff)
+
+        if tariff == "S":
+            return create_response(status_code=200, data=simple(temp_data, prices, start, end))
+        elif tariff == "B":
             #TODO
             pass
-        elif type == "T":
+        elif tariff == "T":
             pass
             #TODO
         return create_response(status_code=400, message="Wrong billing type")
     except BaseException as e:
         logging.debug(e)
+        print(e)
         return create_response(status_code=400, message="Bad arguments")
     
 
