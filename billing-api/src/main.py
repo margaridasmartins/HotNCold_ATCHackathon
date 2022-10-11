@@ -39,12 +39,20 @@ def simple_request(
                 return create_response(status_code=200, data=[0.15 + random() * 0.15]*24) #  generates random billing value between 0.15 and 0.3
 
             elif tariff == "B":
-                #TODO
-                pass
+                # low price hour between 10pm to 8am, 35% less expensive than normal value
+                normal_price = 0.20 + random() * 0.15
+                low_price = 0.65 * normal_price
+                return create_response(status_code=200, data=[low_price]*8 + [normal_price]*14 + [low_price]*2) 
+
             elif tariff == "T":
-                pass
-                #TODO
-            
+                # high price hour between 8am to 10am and 6pm to 9 pm, 50% more expensive than normal value
+                # medium price hour between 10am to 6pm and 9pm to 11 pm
+                # low price hour in the left hours, 50% less expensive than normal value
+                normal_price = 0.20 + random() * 0.15
+                low_price = 0.5 * normal_price
+                high_price = 1.5 * normal_price
+                return create_response(status_code=200, data=[low_price]*8 + [high_price]*2 + [normal_price]*8 + [high_price]*3 + [normal_price]*2 + [low_price]) 
+                
             return create_response(status_code=400, message="Wrong billing type")
 
         return create_response(status_code=400, message="Suplier not supported")
