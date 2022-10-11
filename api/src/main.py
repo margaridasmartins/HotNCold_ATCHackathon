@@ -9,6 +9,7 @@ from utils import create_response
 
 from simple import simple
 from data import get_prices
+from algorithms import min_cost
 
 # Logger
 logging.basicConfig(
@@ -53,7 +54,8 @@ def simple_request(
         prices = get_prices(supplier, tariff)
 
         if tariff == "S":
-            return create_response(status_code=200, data=simple(temp_data, prices, start, end))
+            return create_response(status_code=200, data=min_cost(temp_data, prices, start, end))
+
         elif tariff == "B":
             #TODO
             pass

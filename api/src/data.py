@@ -20,9 +20,13 @@ def get_data(data_path: str, start: datetime, end: datetime) -> list:
         with open(data_path) as f:
 
             data = json.loads(f.read())
+
             data = [(d['airTemperature'], d['time']) for d in data if start <= datetime.fromisoformat(d['time'][:-6]) <= end]
 
+            data = [data[i:i+24] for i in range(0,len(data),24)]
+
             return data
+
     except Exception as e:
         print(e)
         print("error while reading file")
