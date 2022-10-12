@@ -29,3 +29,18 @@ def get_data(data_path: str, start: datetime, end: datetime) -> list:
         print(e)
         print("error while reading file")
         exit(1)     # FIXME: change this to return a error response
+
+
+def get_ipma_data(data_path: str) -> list:
+    try:
+        with open(data_path) as file:
+            data = json.loads(file.read())
+             
+            data = [(d['tMed'], d['dataPrev']) for d in data][1:25] + [(d['tMed'], d['dataPrev']) for d in data][26:50] + [(d['tMed'], d['dataPrev']) for d in data][51:75]
+
+            return data
+
+    except Exception as e:
+        print(e)
+        print("error while reading file")
+        exit(1)
