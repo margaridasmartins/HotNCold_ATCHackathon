@@ -9,43 +9,43 @@ def get_prices(supplier: str, tariff: str) -> list:
     return r.json()["data"]
 
 
-def get_data(data_path: str, start: datetime, end: datetime) -> list:
+def get_data(data_path: str, start: datetime, end: datetime, city: int = 1040200) -> list:
 
     # TODO: add if to check if datetime is between the threshold presented in the file
     # if it is outside maybe use an external api to get the temperatures for the other dates
 
-    try:
-        with open(data_path) as f:
+    if datetime.today().date() == start.date() or datetime.today().date() == end.date():
+        try:
+            r = requests.get(f"https://api.ipma.pt/public-data/forecast/aggregate/{city}.json")
+            data = [d for d in r.json() if 'tMed' in d.keys()]
+                
+            data = [[(float(d['tMed']), d['dataPrev']) for d in data[0:22]], [(float(d['tMed']), d['dataPrev']) for d in data[22:46]], [(float(d['tMed']), d['dataPrev']) for d in data[46:70]]]
 
-            data = json.loads(f.read())
+            example = data[0][0]
 
-            data = [(d['airTemperature'], d['time']) for d in data if start <= datetime.fromisoformat(d['time'][:-6]) <= end]
-
-            data = [data[i:i+24] for i in range(0,len(data),24)]
+            # fix missing temperatures 00:00 and 01:00
+            data[0] = [(example[0]+0.2, example[1][0:12]+"0"+example[1][13:]), (example[0]+0.1, example[1][0:12]+"1"+example[1][13:])] + data[0]
 
             return data
 
-    except Exception as e:
-        print(e)
-        print("error while reading file")
-        exit(1)     # FIXME: change this to return a error response
+        except Exception as e:
+            print(e)
+            print("error while reading file")
+            exit(1)
+    else:
+        try:
+            with open(data_path) as f:
 
+                data = json.loads(f.read())
 
-def get_ipma_data(data_path: str, start: datetime, end: datetime, city: int = 1040200) -> list:
-    try:
-        r = requests.get(f"https://api.ipma.pt/public-data/forecast/aggregate/{city}.json")
-        data = [d for d in r.json() if 'tMed' in d.keys()]
-            
-        data = [[(float(d['tMed']), d['dataPrev']) for d in data[0:22]], [(float(d['tMed']), d['dataPrev']) for d in data[22:46]], [(float(d['tMed']), d['dataPrev']) for d in data[46:70]]]
+                data = [(d['airTemperature'], d['time']) for d in data if start <= datetime.fromisoformat(d['time'][:-6]) <= end]
 
-        example = data[0][0]
+                data = [data[i:i+24] for i in range(0,len(data),24)]
 
-        # fix missing temperatures 00:00 and 01:00
-        data[0] = [(example[0]+0.2, example[1][0:12]+"0"+example[1][13:]), (example[0]+0.1, example[1][0:12]+"1"+example[1][13:])] + data[0]
+                return data
 
-        return data
+        except Exception as e:
+            print(e)
+            print("error while reading file")
+            exit(1)     # FIXME: change this to return a error response
 
-    except Exception as e:
-        print(e)
-        print("error while reading file")
-        exit(1)
