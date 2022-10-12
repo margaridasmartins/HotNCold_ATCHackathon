@@ -140,3 +140,6 @@ def min_cost(data_path, prices, start, end):
                     data.append({'time':t[1], 'mode': 'ECO', 'c_score': 4, 'kwh': 0.4, 'cost': 0.4*price, 'temperature': t})
 
     return data
+
+def dead_hours(data_path, prices, start, end, dead_hours):
+    pass
