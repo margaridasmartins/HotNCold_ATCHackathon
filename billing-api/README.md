@@ -1,6 +1,12 @@
-# Hot N Cold API
+# Hot N Cold Mock Billing API
 
 ## Endpoints:
+
+-  /api/v1/billing - GET
+    - Gives a list of prices per hour
+    - Parameters:
+        - Supplier - the name of the energy suplier
+        - Tariff - the type of the tariff, can be simple, bi-hour or tri-hour
 
 ## Local Instalation
 
@@ -25,10 +31,10 @@ python -m uvicorn main:app --reload
 
 1. Build Image
 ```
-sudo docker build -f Dockerfile -t api ..
+sudo docker build -f Dockerfile -t billing-api .
 ```
 
 2. Run Container
 ```
-sudo docker run --network=host api
+sudo docker run --network=host billing-api
 ```

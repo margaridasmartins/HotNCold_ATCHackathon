@@ -1,15 +1,13 @@
 import json
+import requests
 from datetime import datetime
 
 #http://localhost:8000/api/v1/optimize?start=2021-12-01T00%3A00%3A00&end=2022-01-01T00%3A00%3A00&supplier=EDP&tariff=S
 
 def get_prices(supplier: str, tariff: str) -> list:
-    # TODO: add different tariffs and suppliers
-    if supplier == "EDP":
-        if tariff == "S":
-            return [2 for _ in range(24)]
-    
-    return [1 for _ in range(24)]
+    r = requests.get(f"http://localhost:8001/api/v1/billing?supplier={supplier}&tariff={tariff}")
+    return r.json()["data"]
+
 
 def get_data(data_path: str, start: datetime, end: datetime) -> list:
 
