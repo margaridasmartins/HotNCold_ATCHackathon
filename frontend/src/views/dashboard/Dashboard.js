@@ -182,34 +182,78 @@ const Dashboard = () => {
 
   // FIXME: change this to receive from api
   const locations = [
-    {label:"aveiro", value: 1},
-    {label:"porto", value: 2},
+    { label: "aveiro", value: 1 },
+    { label: "porto", value: 2 },
+  ];
+
+  const suppliers = [
+    { label: "EDP", value: "EDP"},
+    { label: "ENDESA", value: "ENDESA"},
+  ];
+
+  const tariffs = [
+    {label: "Simples", value: "S"},
+    {label: "Bi-horária", value: "B"},
+    {label: "Tri-horária", value: "T"},
   ];
 
   const [location, setLocation] = React.useState("0");
+  const [supplier, setSupplier] = React.useState("");
+  const [tariff, setTariff] = React.useState("");
 
   React.useEffect(() => {
     const loc = localStorage.getItem("location");
-    if(loc) {
-      setLocation(loc);
-    }
+    const sup = localStorage.getItem("supplier");
+    const tar = localStorage.getItem("tariff");
+    
+    if (loc) setLocation(loc);
+
+    if (sup) setSupplier(sup);
+
+    if (tar) setTariff(tar);
+
   }, []);
-  
+
   React.useEffect(() => {
     localStorage.setItem("location", location);
   }, [location]);
 
+  React.useEffect(() => {
+    localStorage.setItem("supplier", supplier);
+  }, [supplier]);
+
+  React.useEffect(() => {
+    localStorage.setItem("tariff", tariff);
+  }, [tariff]);
+
 
   return (
     <>
-      <div style={{margin: 20}} >
+      <div style={{ margin: 20 }} >
         <CFormSelect
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           options={
-            [{label: "Select location", value: 0}, ...locations]
+            [{ label: "Select location", value: 0 }, ...locations]
           }
         />
+
+        <CFormSelect
+          value={supplier}
+          onChange={(e) => setSupplier(e.target.value)}
+          options={
+            [{ label: "Select supplier", value: "" }, ...suppliers]
+          }
+        />
+
+        <CFormSelect
+          value={tariff}
+          onChange={(e) => setTariff(e.target.value)}
+          options={
+            [{ label: "Select tariff", value: "" }, ...tariffs]
+          }
+        />
+
       </div>
 
       <WidgetsDropdown location={location} />
