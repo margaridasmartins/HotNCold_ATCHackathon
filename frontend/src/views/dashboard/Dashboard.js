@@ -5,6 +5,7 @@ import {
   CButton,
   CButtonGroup,
   CCard,
+  CFormSelect,
   CCardBody,
   CCardFooter,
   CCardHeader,
@@ -53,6 +54,7 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
+import { json } from 'react-router-dom'
 
 const Dashboard = () => {
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
@@ -178,9 +180,39 @@ const Dashboard = () => {
     },
   ]
 
+  // FIXME: change this to receive from api
+  const locations = [
+    {label:"aveiro", value: 1},
+    {label:"porto", value: 2},
+  ];
+
+  const [location, setLocation] = React.useState("0");
+
+  React.useEffect(() => {
+    const loc = localStorage.getItem("location");
+    if(loc) {
+      setLocation(loc);
+    }
+  }, []);
+  
+  React.useEffect(() => {
+    localStorage.setItem("location", location);
+  }, [location]);
+
+
   return (
     <>
-      <WidgetsDropdown />
+      <div style={{margin: 20}} >
+        <CFormSelect
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          options={
+            [{label: "Select location", value: 0}, ...locations]
+          }
+        />
+      </div>
+
+      <WidgetsDropdown location={location} />
       <CCard className="mb-4">
         <CCardBody>
           <CRow>
