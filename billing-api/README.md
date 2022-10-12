@@ -7,6 +7,11 @@
     - Parameters:
         - Supplier - the name of the energy suplier
         - Tariff - the type of the tariff, can be simple, bi-hour or tri-hour
+    
+    Example
+    ```
+    /api/v1/billing?supplier=EDP&tariff=B
+    ```
 
 ## Local Instalation
 
