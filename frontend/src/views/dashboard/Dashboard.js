@@ -54,6 +54,8 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 
+import { LineChart } from "src/views/charts"
+
 const Dashboard = () => {
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
@@ -181,27 +183,22 @@ const Dashboard = () => {
   return (
     <>
       <WidgetsDropdown />
+      <LineChart />
       <CCard className="mb-4">
+        <CCardHeader>Pie Chart</CCardHeader>
         <CCardBody>
-          <CRow>
-            <CCard className="mb-4">
-              <CCardHeader>Pie Chart</CCardHeader>
-              <CCardBody>
-                <CChartPie
-                  data={{
-                    labels: ['Red', 'Green', 'Yellow'],
-                    datasets: [
-                      {
-                        data: [300, 50, 100],
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-                        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-                      },
-                    ],
-                  }}
-                />
-              </CCardBody>
-            </CCard>
-          </CRow>
+          <CChartPie
+            data={{
+              labels: ['Red', 'Green', 'Yellow'],
+              datasets: [
+                {
+                  data: [300, 50, 100],
+                  backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                  hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                },
+              ],
+            }}
+          />
         </CCardBody>
       </CCard>
       <CCard className="mb-4">
