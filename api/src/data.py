@@ -10,6 +10,27 @@ def get_prices(supplier: str, tariff: str) -> list:
 
 
 def get_data(data_path: str, start: datetime, end: datetime, city: int = 1040200) -> list:
+    """
+    Method to obtain the temperatures recorded/predicted in a certain time interval
+    Parameters
+    ----------
+        data_path : `str`
+            Path to the file with measurements.
+
+        start : `DateTime`
+            First day of the search interval.
+
+        end : `DateTime`
+            Last day of the search interval.
+        
+        city : `int`
+            ipma city code
+
+    Returns
+    -------
+        response : `list with tuples(float, str)`
+            List with tuples with a temperature and its associated datetime
+    """
 
     # TODO: add if to check if datetime is between the threshold presented in the file
     # if it is outside maybe use an external api to get the temperatures for the other dates
@@ -17,14 +38,14 @@ def get_data(data_path: str, start: datetime, end: datetime, city: int = 1040200
     if datetime.today().date() == start.date() or datetime.today().date() == end.date():
         try:
             r = requests.get(f"https://api.ipma.pt/public-data/forecast/aggregate/{city}.json")
-            data = [d for d in r.json() if 'tMed' in d.keys()]
+            data = [d for d in r.json() if 'tMed' in d.keys() and start.date() <= datetime.fromisoformat(d['dataPrev'][:-6]).date() <= end.date()]
                 
-            data = [[(float(d['tMed']), d['dataPrev']) for d in data[0:22]], [(float(d['tMed']), d['dataPrev']) for d in data[22:46]], [(float(d['tMed']), d['dataPrev']) for d in data[46:70]]]
-
-            example = data[0][0]
+            data = [(float(d['tMed']), d['dataPrev']) for d in data]
 
             # fix missing temperatures 00:00 and 01:00
-            data[0] = [(example[0]+0.2, example[1][0:12]+"0"+example[1][13:]), (example[0]+0.1, example[1][0:12]+"1"+example[1][13:])] + data[0]
+            data = [(data[0][0]+0.2, data[0][1][0:12]+"0"+data[0][1][13:]), (data[0][0]+0.1, data[0][1][0:12]+"1"+data[0][1][13:])] + data
+
+            data = [data[i:i+24] for i in range(0,len(data),24)]
 
             return data
 
