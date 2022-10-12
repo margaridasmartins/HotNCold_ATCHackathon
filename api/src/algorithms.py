@@ -1,6 +1,6 @@
 from data import get_data
 
-def best_ratio(data_path, prices, start, end):
+def best_ratio(prices, start, end, city= 1040200):
     """
     Algorithm to calculate results with best score/price ratio.
     Parameters
@@ -16,6 +16,8 @@ def best_ratio(data_path, prices, start, end):
 
         end : `DateTime`
             Last day of the search interval.
+        city :  int
+            Temperature Location ID
 
     Returns
     -------
@@ -23,7 +25,7 @@ def best_ratio(data_path, prices, start, end):
             List with dictionaries, where each dictionary is a group of statistics related to an hour.
     """
 
-    all_temps = get_data(data_path, start, end)
+    all_temps = get_data(start, end, city)
 
     data = []
 
@@ -54,7 +56,7 @@ def best_ratio(data_path, prices, start, end):
     return data
 
 
-def min_cost(data_path, prices, start, end):
+def min_cost(prices, start, end,  city= 1040200):
     """
     Algorithm to calculate results with the lowest cost.
     Parameters
@@ -70,6 +72,8 @@ def min_cost(data_path, prices, start, end):
 
         end : `DateTime`
             Last day of the search interval.
+        city :  int
+            Temperature Location ID
 
     Returns
     -------
@@ -77,7 +81,7 @@ def min_cost(data_path, prices, start, end):
             List with dictionaries, where each dictionary is a group of statistics related to an hour.
     """
 
-    all_temps = get_data(data_path, start, end)
+    all_temps = get_data( start, end,  city)
 
     data = []
 
@@ -132,7 +136,7 @@ def min_cost(data_path, prices, start, end):
 
     return data
 
-def dead_hours(data_path, prices, start, end, dead_hours):
+def dead_hours(prices, start, end, dead_hours, city= 1040200):
     """
     Algorithm to calculate results with best score/price ratio.
     Parameters
@@ -151,13 +155,15 @@ def dead_hours(data_path, prices, start, end, dead_hours):
 
         dead_hours: `List[int]`
             List with the hours where heating does not matter
+        city :  int
+            Temperature Location ID
 
     Returns
     -------
         response : `list with dictionaries`
             List with dictionaries, where each dictionary is a group of statistics related to an hour.
     """
-    all_temps = get_data(data_path, start, end)
+    all_temps = get_data( start, end,  city)
 
     data = []
 
