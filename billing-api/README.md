@@ -2,6 +2,12 @@
 
 ## Endpoints:
 
+-  /api/v1/billing - GET
+    - Gives a list of prices per hour
+    - Parameters:
+        - Supplier - the name of the energy suplier
+        - Tariff - the type of the tariff, can be simple, bi-hour or tri-hour
+
 ## Local Instalation
 
 1. (Optional) Create a virtual environment
@@ -30,5 +36,5 @@ sudo docker build -f Dockerfile -t billing-api .
 
 2. Run Container
 ```
-sudo docker run -p 8001:8001 billing-api
+sudo docker run --network=host billing-api
 ```

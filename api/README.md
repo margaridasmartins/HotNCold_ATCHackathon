@@ -30,5 +30,5 @@ sudo docker build -f Dockerfile -t api ..
 
 2. Run Container
 ```
-sudo docker run -p 8000:8000 api
+sudo docker run --network=host api
 ```

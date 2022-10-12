@@ -53,16 +53,11 @@ def simple_request(
         temp_data = data_path + 'temperatureData.json'
         prices = get_prices(supplier, tariff)
 
-        if tariff == "S":
-            return create_response(status_code=200, data=min_cost(temp_data, prices, start, end))
-
-        elif tariff == "B":
-            #TODO
-            pass
-        elif tariff == "T":
-            pass
-            #TODO
-        return create_response(status_code=400, message="Wrong billing type")
+        if len(prices) == 0:
+            return create_response(status_code=400, message="Wrong billing type")
+        
+        return create_response(status_code=200, data=min_cost(temp_data, prices, start, end))
+        
     except BaseException as e:
         logging.debug(e)
         print(e)
