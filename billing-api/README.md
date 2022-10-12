@@ -24,7 +24,7 @@ pip install -r requirements.txt
 3. Running 
 ```
 cd src
-python -m uvicorn main:app --reload
+python -m uvicorn main:app --reload --port 8001
 ```
 
 ## Docker Instalation

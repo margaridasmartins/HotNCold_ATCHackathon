@@ -7,9 +7,8 @@ import os
 
 from utils import create_response
 
-from simple import simple
 from data import get_prices
-from algorithms import dead_hours, min_cost
+from algorithms import dead_hours, min_cost, best_ratio
 
 # Logger
 logging.basicConfig(
