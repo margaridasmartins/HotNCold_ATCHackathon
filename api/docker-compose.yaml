@@ -1,0 +1,13 @@
+version: "3"
+services:
+  backend:
+    image: hnc_backend:latest
+    ports: 
+      - 8000:8000
+  # still need frontend image
+  frontend:
+    image: ghcr.io/brunosbastos/es_tdg/frontend:latest
+    links:
+      - api1
+      - api2
+      - api3
