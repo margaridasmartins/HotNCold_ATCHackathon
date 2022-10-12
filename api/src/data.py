@@ -31,14 +31,19 @@ def get_data(data_path: str, start: datetime, end: datetime) -> list:
         exit(1)     # FIXME: change this to return a error response
 
 
-def get_ipma_data(data_path: str) -> list:
+def get_ipma_data(data_path: str, start: datetime, end: datetime, city: int = 1040200) -> list:
     try:
-        with open(data_path) as file:
-            data = json.loads(file.read())
-             
-            data = [(d['tMed'], d['dataPrev']) for d in data][1:25] + [(d['tMed'], d['dataPrev']) for d in data][26:50] + [(d['tMed'], d['dataPrev']) for d in data][51:75]
+        r = requests.get(f"https://api.ipma.pt/public-data/forecast/aggregate/{city}.json")
+        data = [d for d in r.json() if 'tMed' in d.keys()]
+            
+        data = [[(float(d['tMed']), d['dataPrev']) for d in data[0:22]], [(float(d['tMed']), d['dataPrev']) for d in data[22:46]], [(float(d['tMed']), d['dataPrev']) for d in data[46:70]]]
 
-            return data
+        example = data[0][0]
+
+        # fix missing temperatures 00:00 and 01:00
+        data[0] = [(example[0]+0.2, example[1][0:12]+"0"+example[1][13:]), (example[0]+0.1, example[1][0:12]+"1"+example[1][13:])] + data[0]
+
+        return data
 
     except Exception as e:
         print(e)
