@@ -13,6 +13,16 @@ api. It's data source is the Germany’s National Meteorological Service, the De
     ```
     /api/v1/locations
     ```
+-  /api/v1/temperatures/{id} - GET
+    - Gives hourly temperatures for the given time range
+    - Parameters:
+        - Start - the start datetime as string (inclusive)
+        - End - the end datetime as string (exclusive)
+        - Id - the id of the location
+    Example
+    ```
+    /api/v1/temperatures/2?start=2021-12-01T00:00:00&end=2022-01-01T00:00:00
+    ```
 
 ## Local Instalation
 

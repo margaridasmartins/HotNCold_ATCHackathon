@@ -1,8 +1,10 @@
+from datetime import datetime
 import logging
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 import os
+import json
 
 from utils import create_response
 
@@ -18,13 +20,9 @@ app = FastAPI()
 data_path= "../data/" # data temperature files
 
 @app.get("/api/v1/locations")
-def simple_request()-> JSONResponse:
+def locations()-> JSONResponse:
     """
     Endpoint ``/locations`` that accepts the method GET. Returns the list of locations and its id
-        supplier:
-            The name of the supplier
-        tariff: `str`
-            The corresponding tariff type. Available "S", "B", "T"
     Returns
     -------
         response : `JSONResponse`
@@ -43,5 +41,40 @@ def simple_request()-> JSONResponse:
         logging.debug(e)
         print(e)
         return create_response(status_code=400, message="Sorry something went wrong")
-    
+
+@app.get("/api/v1/temperatures/{id}")
+def temperatures(
+        id,
+        start: datetime,
+        end: datetime
+    )-> JSONResponse:
+    """
+    Endpoint ``/temperatures`` that accepts the method GET. Returns the hourly temperature for a given location
+        id: int
+            The location id
+        start: `datetime`
+            The start datetime as string (inclusive)
+        end: `datetime`
+            The end datetime as string (exclusive)
+    Returns
+    -------
+        response : `JSONResponse`
+            Json response with the status code and data.
+    """
+    try:
+        temp_files = os.listdir(data_path)
+
+        for f in temp_files:
+            if f[0] == id:
+                with open(data_path+f) as temp_file:
+                    data = json.loads(temp_file.read())
+                    data = [(d['airTemperature'], d['time']) for d in data if start <= datetime.fromisoformat(d['time'][:-6]) <= end]
+                    return  create_response(status_code=200, data=data)
+
+        return create_response(status_code=404,message="Location does not exist")
+    except BaseException as e:
+        logging.debug(e)
+        print(e)
+        return create_response(status_code=400, message="Sorry something went wrong")
+
 
