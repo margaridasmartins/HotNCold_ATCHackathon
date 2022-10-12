@@ -65,7 +65,7 @@ def temperatures(
         temp_files = os.listdir(data_path)
 
         for f in temp_files:
-            if f[0] == id:
+            if f[:7] == id:
                 with open(data_path+f) as temp_file:
                     data = json.loads(temp_file.read())
                     data = [(d['airTemperature'], d['time']) for d in data if start <= datetime.fromisoformat(d['time'][:-6]) <= end]
