@@ -59,6 +59,7 @@ def simple_request(
         print(e)
         return create_response(status_code=400, message="Bad arguments")
 
+
 @app.get("/api/v1/bestratio")
 def simple_request(
         start:  datetime.datetime,
@@ -98,6 +99,7 @@ def simple_request(
         print(e)
         return create_response(status_code=400, message="Bad arguments")
 
+
 @app.get("/api/v1/deadhours")
 def deadhours_request(
         start: datetime.datetime,
@@ -135,11 +137,9 @@ def deadhours_request(
             return create_response(status_code=400, message="Wrong billing type")
         
 
-        return create_response(status_code=200, data=dead_hours( prices, start, end, hours, city))
+        return create_response(status_code=200, data=min_cost(prices, start, end, city, hours))
         
     except BaseException as e:
         logging.debug(e)
         print(e)
         return create_response(status_code=400, message="Bad arguments")
-
-

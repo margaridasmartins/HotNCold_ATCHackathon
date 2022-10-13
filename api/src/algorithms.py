@@ -75,7 +75,7 @@ def min_cost(prices, start, end, city= 1040200, dead_hours=[]):
 
     Returns
     -------
-        response : `list with dictionaries`
+        response : `list[dict]`
             List with dictionaries, where each dictionary is a group of statistics related to an hour.
     """
 
@@ -98,18 +98,18 @@ def min_cost(prices, start, end, city= 1040200, dead_hours=[]):
 
                 kw_confort = [temp["kw"] for temp in config["CONFORT"]["temp_intervals"] if temp["min_temp"] <= t[0] < temp["max_temp"]][0]
 
-                extra_cost.append(((kw_confort-kw_eco)*prices[i], i))
+                extra_cost.append((i, (kw_confort-kw_eco)*prices[i], t[0]))
 
             else: # dead hours are always ECO
                 kw_eco = [temp["kw"] for temp in config["ECO"]["temp_intervals"] if temp["min_temp"] <= t[0] < temp["max_temp"]][0]
 
                 data.append({'time':t[1], 'mode': 'ECO', 'c_score': config["ECO"]["confort_score"], 'kwh': kw_eco, 'cost': kw_eco*prices[i], 'temperature': t[0]})
 
-        extra_cost = sorted(extra_cost, key = lambda x: x[0])
+        extra_cost = sorted(extra_cost, key = lambda x: (x[1], -x[2]))
 
         num_hours_confort = ceil((124 - 24*config["ECO"]["confort_score"])/(config["CONFORT"]["confort_score"]-config["ECO"]["confort_score"]))
 
-        indexes = [x[1] for x in extra_cost[0:num_hours_confort]]
+        indexes = [x[0] for x in extra_cost[0:num_hours_confort]]
 
         # iterate through measurements of a day
         for i, t in enumerate(temps):
