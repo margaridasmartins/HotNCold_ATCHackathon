@@ -22,7 +22,7 @@ The application is available at: TBA
 
 
 ## Arquitecture
-![Hot N Cold Arquitecture](https://github.com/margaridasmartins/HotNCold_ATCHackathon/blob/dev/assets/arch_final.png)
+![Hot N Cold Arquitecture](https://github.com/margaridasmartins/HotNCold_ATCHackathon/blob/main/assets/arch_final.png)
 
 ## Instalation
 TODO
