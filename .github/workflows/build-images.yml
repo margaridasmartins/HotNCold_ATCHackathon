@@ -15,8 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Docker login
+      env:
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       run: |
-        docker login -u hotncold -p ${{secrets.DOCKERHUB_TOKEN}}
+        docker login -u hotncold -p ${ DOCKERHUB_TOKEN }
     - name: Build Docker Main API image
       run: |
         git pull        
