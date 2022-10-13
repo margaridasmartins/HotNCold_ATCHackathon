@@ -57,7 +57,7 @@ def best_ratio(prices, start, end, city= 1040200):
 
 def min_cost(prices, start, end, city= 1040200, dead_hours=[]):
     """
-    Algorithm to calculate results with best score/price ratio.
+    Algorithm to calculate results with the minimum cost considering min 124 confort score and deadhours.
     Parameters
     ----------
         data_path : `str`
