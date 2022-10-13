@@ -23,7 +23,7 @@ jobs:
       env:
         DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
       run: |
-        echo "${DOCKERHUB_TOKEN}" | docker login -u hotncold --password-stdin
+        echo "${{secrets.DOCKERHUB_TOKEN}}"
     - name: Build Docker Main API image
       run: |
         git pull        
