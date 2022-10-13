@@ -1,0 +1,43 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker login
+      run: |
+        docker login -u hotncold -p ${{secrets.GITHUB_TOKEN}}
+    - name: Build Docker Main API image
+      run: |
+        git pull        
+        cd api
+        docker build . --file Dockerfile --tag main_api:latest
+    - name: Build Docker Billing API image
+      run: |
+        cd billing-api
+        docker build . --file Dockerfile --tag billing_api:latest
+    - name: Build Docker Temp API image
+      run: |
+        cd temp-api
+        docker build . --file Dockerfile --tag temp_api:latest
+    - name: Build Docker Frontend image
+      run: |
+        cd frontend
+        docker build . --file Dockerfile --tag frontend:latest
+    - name: Push images to registry
+      run: |
+        docker push hotncold/main_api:latest
+        docker push hotncold/billing_api:latest
+        docker push hotncold/temp_api:latest      
+        docker push hotncold/frontend:latest
+
