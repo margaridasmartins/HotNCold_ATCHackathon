@@ -21,7 +21,7 @@ api. It's data source is the Germany’s National Meteorological Service, the De
         - Id - the id of the location
     Example
     ```
-    /api/v1/temperatures/2?start=2021-12-01T00:00:00&end=2022-01-01T00:00:00
+    /api/v1/temperatures/1010500?start=2021-12-01T00:00:00&end=2022-01-01T00:00:00
     ```
 
 ## Local Instalation
