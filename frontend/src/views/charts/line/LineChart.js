@@ -18,7 +18,7 @@ const LineChart = () => {
             <CCardHeader>Line Chart</CCardHeader>
             <CCardBody  >
                 <select id="selectButton"></select>
-                <div id="chart" style={{height: '400px'}}></div>
+                <div id="chart" style={{ height: '400px' }}></div>
             </CCardBody>
         </CCard>
     )
