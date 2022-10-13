@@ -45,42 +45,34 @@ import {
   cilUserFemale,
 } from '@coreui/icons'
 
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
-
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 import { json } from 'react-router-dom'
+import billingservice from "../../services/BillingService.js";
+import temperatureservice from "../../services/TemperatureService.js";
 
 const Dashboard = () => {
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
-  // FIXME: change this to receive from api
-  const locations = [
-    { label: "aveiro", value: 1 },
-    { label: "porto", value: 2 },
-  ];
+  const [locations, setLocations] = React.useState([]);
 
-  const suppliers = [
-    { label: "EDP", value: "EDP"},
-    { label: "ENDESA", value: "ENDESA"},
-  ];
+  const [suppliers, setSuppliers] = React.useState([]);
 
-  const tariffs = [
+  const [tariffs, setTariffs] = React.useState([
     {label: "Simples", value: "S"},
     {label: "Bi-horária", value: "B"},
     {label: "Tri-horária", value: "T"},
-  ];
+  ]);
 
   const [location, setLocation] = React.useState("0");
   const [supplier, setSupplier] = React.useState("");
   const [tariff, setTariff] = React.useState("");
 
   React.useEffect(() => {
+    temperatureservice.get_locations()
+    .then((res) => res.json())
+    .then((res) => setLocations(res.data))
+
     const loc = localStorage.getItem("location");
     const sup = localStorage.getItem("supplier");
     const tar = localStorage.getItem("tariff");
@@ -95,10 +87,25 @@ const Dashboard = () => {
 
   React.useEffect(() => {
     localStorage.setItem("location", location);
+    billingservice.get_suppliers()
+    .then((res) => res.json())
+    .then((res) => {
+      let temp = res.data.map((s) => {
+        return {label: s, value: s}
+      })
+      setSuppliers(temp);
+    })
   }, [location]);
 
   React.useEffect(() => {
     localStorage.setItem("supplier", supplier);
+    if(supplier) {
+      billingservice.get_tariffs(supplier)
+      .then((res) => res.json())
+      .then((res) => {
+        setTariffs(res.data)  
+      })
+    }
   }, [supplier]);
 
   React.useEffect(() => {
@@ -116,6 +123,7 @@ const Dashboard = () => {
             [{ label: "Select location", value: 0 }, ...locations]
           }
         />
+        {location != 0 ? 
         <CFormSelect
           value={supplier}
           onChange={(e) => setSupplier(e.target.value)}
@@ -123,6 +131,8 @@ const Dashboard = () => {
             [{ label: "Select supplier", value: "" }, ...suppliers]
           }
         />
+        :<></>}
+        {supplier ? 
         <CFormSelect
           value={tariff}
           onChange={(e) => setTariff(e.target.value)}
@@ -130,12 +140,13 @@ const Dashboard = () => {
             [{ label: "Select tariff", value: "" }, ...tariffs]
           }
         />
+        : <></>}
       </div>
 
       {
         location != 0 && supplier != "" && tariff != "" 
         ? 
-        <WidgetsDropdown location={location} /> 
+        <WidgetsDropdown location={location} supplier={supplier} tariff={tariff} /> 
         : <h1>Please choose your preferences.</h1>
       }
       

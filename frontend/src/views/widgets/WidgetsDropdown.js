@@ -27,7 +27,7 @@ const WidgetsDropdown = ({location, supplier, tariff}) => {
   ]);
   
   React.useEffect(() => {
-    apiservice.get_last_24h("1040200", supplier, tariff)    // TODO: hardcoded city
+    apiservice.get_last_24h(location, supplier, tariff)    // TODO: hardcoded city
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
