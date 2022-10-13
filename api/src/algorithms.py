@@ -44,7 +44,7 @@ def best_ratio(prices, start, end, city= 1040200):
 
             kw_confort = [temp["kw"] for temp in config["CONFORT"]["temp_intervals"] if temp["min_temp"] <= t[0] < temp["max_temp"]][0]
 
-            if num_hours_confort-i+n_confort>7 and config["ECO"]["confort_score"]/kw_eco > config["CONFORT"]["confort_score"]/kw_confort:
+            if num_hours_confort-i+n_confort>7 and config["ECO"]["confort_score"]/kw_eco/prices[i] > config["CONFORT"]["confort_score"]/kw_confort/prices[i]:
                 data.append({'time':t[1], 'mode': 'ECO', 'c_score': config["ECO"]["confort_score"], 'kwh': kw_eco, 'cost': kw_eco*prices[i], 'temperature': t[0]})
             else:
                 n_confort+=1
