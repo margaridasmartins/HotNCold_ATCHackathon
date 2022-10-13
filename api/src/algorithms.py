@@ -4,23 +4,23 @@ import json
 
 def best_ratio(prices, start, end, city= 1040200):
     """
-    Algorithm to calculate results with best score/price ratio.
+    Algorithm to calculate results with best score/price ratio considering min 124 confort score.
     Parameters
     ----------
         data_path : `str`
             Path to the file with measurements.
-        prices : `list with float values`
+        prices : `list[float]`
             List with all the prices.
         start : `DateTime`
             First day of the search interval.
         end : `DateTime`
             Last day of the search interval.
         city :  int
-            Temperature Location ID
+            Temperature Location ID.
 
     Returns
     -------
-        response : `list with dictionaries`
+        response : `list[dict]`
             List with dictionaries, where each dictionary is a group of statistics related to an hour.
     """
 
@@ -67,9 +67,9 @@ def min_cost(prices, start, end, city= 1040200, dead_hours=[]):
         end : `DateTime`
             Last day of the search interval.
         city : `int`
-            Temperature Location ID
+            Temperature Location ID.
         dead_hours: `list[int]`
-            List with the hours where heating does not matter
+            List with the hours where heating does not matter.
 
     Returns
     -------
