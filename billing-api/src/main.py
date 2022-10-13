@@ -17,7 +17,7 @@ app = FastAPI()
 supliers = ["EDP", "GALP", "ENDESA"] # list of available suppliers
 
 @app.get("/api/v1/billing")
-def simple_request(
+def billing(
         supplier:  str,
         tariff: str = "S",
     )-> JSONResponse:
@@ -61,4 +61,20 @@ def simple_request(
         print(e)
         return create_response(status_code=400, message="Bad arguments")
     
+
+@app.get("/api/v1/suppliers")
+def suppliers() -> JSONResponse:
+    """
+    Endpoint ``/suppliers`` that accepts the method GET. Returns a list of available suppliers
+    Returns
+    -------
+        response : `JSONResponse`
+            Json response with the status code and data.
+    """
+    try:
+        return create_response(status_code=200, data=supliers) 
+    except BaseException as e:
+        logging.debug(e)
+        print(e)
+        return create_response(status_code=400, message="Bad arguments")
 

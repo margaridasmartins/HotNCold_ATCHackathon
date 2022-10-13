@@ -12,6 +12,12 @@
     ```
     /api/v1/billing?supplier=EDP&tariff=B
     ```
+- /api/v1/suppliers - GET
+    - Gives a list of available suppliers
+    Example
+    ```
+    /api/v1/suppliers
+    ```
 
 ## Local Instalation
 
