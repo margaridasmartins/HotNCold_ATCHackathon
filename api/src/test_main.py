@@ -15,7 +15,7 @@ def test_min_cost_algorithm_no_dead_hours(mock_get_data):
     from algorithms import min_cost
     """
     Given a user
-    When he requests calculations using the min_cost algorithm  model
+    When he requests calculations using the min_cost algorithm model
     The the API should return values so that the confort score 
     is a minimum of 124 and the price is as low as possible
     """
@@ -36,3 +36,57 @@ def test_min_cost_algorithm_no_dead_hours(mock_get_data):
     total_price = sum([r['cost'] for r in result])
     assert round(total_price,1) == 11.6
 
+
+@mock.patch("data.get_data")
+def test_min_cost_algorithm_with_dead_hours(mock_get_data):
+    from algorithms import min_cost
+    """
+    Given a user
+    When he requests calculations using the min_cost algorithm model
+    The the API should return values so that the confort score 
+    is a minimum of 124 and the price is as low as possible
+    considering dead hours
+    """
+    city = '1010500'
+    format = "%Y-%m-%dT%H:%M:%S"
+    start = datetime.datetime.strptime('2021-12-01T00:00:00', format)
+    end= datetime.datetime.strptime('2021-12-02T00:00:00', format)
+
+    mock_get_data.return_value = mock_temp_data
+    result = min_cost(mock_bill_data,start,end,city, [14, 15, 16])
+
+    assert mock_get_data.assert_called_once
+    assert len(result) == 24
+
+    total_confort_score = sum([r['c_score']for r in result])
+    assert total_confort_score == 124
+
+    total_price = sum([r['cost'] for r in result])
+    assert round(total_price,1) == 11.6
+
+
+@mock.patch("data.get_data")
+def test_best_ratio_algorithm_with_dead_hours(mock_get_data):
+    from algorithms import best_ratio
+    """
+    Given a user
+    When he requests calculations using the best_ratio algorithm model
+    The the API should return values so that the confort score 
+    is a minimum of 124 and it has the best ratio confort score / price
+    """
+    city = '1010500'
+    format = "%Y-%m-%dT%H:%M:%S"
+    start = datetime.datetime.strptime('2021-12-01T00:00:00', format)
+    end= datetime.datetime.strptime('2021-12-02T00:00:00', format)
+
+    mock_get_data.return_value = mock_temp_data
+    result = best_ratio(mock_bill_data,start,end,city)
+
+    assert mock_get_data.assert_called_once
+    assert len(result) == 24
+
+    total_confort_score = sum([r['c_score']for r in result])
+    assert total_confort_score == 192
+
+    total_price = sum([r['cost'] for r in result])
+    assert round(total_price,1) == 16.0
