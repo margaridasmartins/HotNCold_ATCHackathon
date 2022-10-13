@@ -19,16 +19,14 @@ export function mountChart(id, data) {
         .on("touchstart", event => event.preventDefault());
 
     // Define margins
-    var margin = { top: 20, right: 20, bottom: 30, left: 50 },
+    var margin = { top: 20, right: 50, bottom: 30, left: 50 },
         width = parseInt(parent.style("width")) - margin.left - margin.right,
         height = parseInt(parent.style("height")) - margin.top - margin.bottom;
 
-    // Define date parser
-    var parseDate = d3.timeParse("%Y-%m-%d %H:%M:%S");
     // Format the data field
     data.forEach(function (d) {
-        const parsed = parseDate(d["Order Month"]);
-        if (parsed) d["Order Month"] = parsed
+        const parsed = d3.isoParse(d["time"]);
+        if (parsed) d["time"] = parsed
     });
 
     // Define svg canvas
@@ -40,26 +38,33 @@ export function mountChart(id, data) {
 
     // Set the color domain equal to the three product categories
     var productCategories = Object.keys(data[0])
-        .filter(function (key) { return (key !== "Order Month") && (key !== "metric") });
+        .filter(function (key) { return (key !== "time") && (key !== "temperature") && (key !== "mode") });
 
     // Define scales
     var xScale = d3.scaleTime().range([0, width]);
+    var tempScale = d3.scaleLinear().range([height, 0]);
     var yScale = productCategories.reduce((acc, key) => (
         acc[key] = d3.scaleLinear().range([height, 0]), acc), {})
-    var color = d3.scaleOrdinal().range(["#8c510a", "#dfc27d", "#35978f"]);
 
     // Define axes
     var xAxis = d3.axisBottom(xScale);
+    var tempAxis = d3.axisLeft(tempScale);
     var yAxis = productCategories.reduce((acc, key) => (
-        acc[key] = d3.axisLeft(yScale[key]), acc), {})
+        acc[key] = d3.axisRight(yScale[key]), acc), {})
 
     var currCategory = productCategories[0];
     var hoverCategory;
 
     // Define lines
-    var line = productCategories.reduce((acc, key) => (
+
+    const tempLine = d3.line()
+        .x(function (d) { return xScale(d["time"]); })
+        .y(function (d) { return tempScale(d["temperature"]); })
+        .curve(d3.curveBasis)
+
+    const line = productCategories.reduce((acc, key) => (
         acc[key] = d3.line()
-            .x(function (d) { return xScale(d["date"]); })
+            .x(function (d) { return xScale(d["time"]); })
             .y(function (d) { return yScale[key](d["concentration"]); })
             .curve(d3.curveBasis), acc), {})
 
@@ -70,7 +75,7 @@ export function mountChart(id, data) {
 
 
     // Filter the data to only include a single metric
-    var subset = data.filter(function (el) { return el.metric === "Cost" });
+    var subset = data.filter(function (el) { return true });
     // console.log(JSON.stringify(subset, null, 2))
 
     // Reformat data to make it more copasetic for d3
@@ -80,19 +85,19 @@ export function mountChart(id, data) {
         return {
             category: category,
             datapoints: subset.map(function (d) {
-                return { date: d["Order Month"], concentration: +d[category] }
+                return { time: d["time"], concentration: +d[category] }
             })
         }
     })
     console.log(JSON.stringify(concentrations, null, 2)) // to view the structure
 
     // Set the domain of the axes
-    xScale.domain(d3.extent(subset, function (d) { return d["Order Month"]; }));
+    xScale.domain(d3.extent(subset, d => d["time"]));
+    tempScale.domain(d3.extent(subset, d => d["temperature"]));
     Object.values(yScale).forEach((scale, index) =>
         scale.domain([0, d3.max(concentrations[index].datapoints, d => d.concentration)])); TODO:
 
     Object.values(yScale).forEach((scale, index) => console.log([0, d3.max(concentrations[index].datapoints, d => d.concentration)])); TODO:
-    color.domain(productCategories);
 
     // var zDomain = new d3.InternSet(d3.map(subset, d => d.metric));
     // console.log(zDomain)
@@ -100,12 +105,17 @@ export function mountChart(id, data) {
     // Place the axes on the chart
     svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", `translate(0, ${height})`)
         .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "t axis")
+        .call(tempAxis);
 
     productCategories.forEach(d =>
         svg.append("g")
             .attr("class", `y axis ${d}`)
+            .attr("transform", `translate(${width}, 0)`)
             .style("opacity", d === currCategory ? 0 : 0)
             .call(yAxis[d])
     )
@@ -117,18 +127,23 @@ export function mountChart(id, data) {
     // .style("text-anchor", "beginning")
     // .text("Product Concentration");
 
-    var products = svg.selectAll(".category")
+    svg.append("g")
+        .attr("class", "notcategory temperature")
+        .append("path")
+        .attr("d", tempLine(data))
+        .attr("fill", "#99999922")
+        .attr("class", "notline")
+        .attr("stroke", "#99999966")
+        .style("stroke-width", 2)
+
+    const products = svg.selectAll(".category")
         .data(concentrations)
         .enter().append("g")
         .attr("class", d => `category ${d.category}`);
 
-
     products.append("path")
         .attr("fill", "none")
         .attr("class", "line")
-        .attr("d", function (d) { return line[d.category](d.datapoints); })
-        .style("stroke", function (d) { return color(d.category); })
-        .style("stroke-dasharray", d => d.category === currCategory ? null : "5,5")
         .style("stroke-width", 2)
 
     // console.log(JSON.stringify(d3.values(concentrations), null, 2)) // to view the structure
@@ -150,15 +165,15 @@ export function mountChart(id, data) {
 
         const c = d3.map(concentrations, ({ category, datapoints }) => ({
             category,
-            least: d3.least(datapoints, x => Math.hypot(xScale(x.date) - xm, yScale[category](x.concentration) - ym))
+            least: d3.least(datapoints, x => Math.hypot(xScale(x.time) - xm, yScale[category](x.concentration) - ym))
         }))
         // console.log(c)
-        const cc = d3.least(c, ({ category, least }) => Math.hypot(xScale(least.date) - xm, yScale[category](least.concentration) - ym))
+        const cc = d3.least(c, ({ category, least }) => Math.hypot(xScale(least.time) - xm, yScale[category](least.concentration) - ym))
 
         hoverCategory = cc.category;
 
         products
-            .style("opacity", d => d.category === hoverCategory ? 1 : 0.5)
+            .style("opacity", d => [currCategory, hoverCategory].includes(d.category) ? 1 : 0.5)
             .filter(d => d.category === hoverCategory)
             .raise();
 
@@ -194,6 +209,7 @@ export function mountChart(id, data) {
 
         // Update the range of the scale with new width/height
         xScale.range([0, width]);
+        tempScale.range([height, 0])
         Object.values(yScale).forEach(scale => scale.range([height, 0]))
 
         parent
@@ -202,22 +218,27 @@ export function mountChart(id, data) {
 
         // Update the axis and text with the new scale
         svg.select('.x.axis')
-            .attr("transform", "translate(0," + height + ")")
+            .attr("transform", `translate(0, ${height})`)
             .call(xAxis);
 
         productCategories.forEach(d =>
             svg.select(`.y.axis.${d}`)
+                .attr("transform", `translate(${width}, 0)`)
                 .style("opacity", d === currCategory ? 1 : 0)
                 .call(yAxis[d])
         )
 
         // Force D3 to recalculate and update the line
         svg.selectAll('.line')
-            .style("stroke-dasharray", d => d.category === currCategory ? null : "5,5")
-            .attr("d", function (d) { return line[d.category](d.datapoints); });
+            .style("stroke-dasharray", d => d.category === currCategory ? null : "3,3")
+            .attr("d", d => line[d.category](d.datapoints));
+
+        svg.selectAll('.notline')
+            .attr("d", d => tempLine(data));
 
         // Update the tick marks
         xAxis.ticks(Math.max(width / 75, 2));
+        tempAxis.ticks(Math.max(height / 50, 2));
         Object.values(yAxis).forEach(axis => axis.ticks(Math.max(height / 50, 2)))
     };
 

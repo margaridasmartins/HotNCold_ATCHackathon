@@ -3,12 +3,13 @@ import { CCard, CCardBody, CCardHeader } from '@coreui/react'
 
 import { mountChart } from "./chart"
 import data from "./data"
+import './styles.css'
 
 
 const LineChart = () => {
 
     useEffect(() => {
-        const unmountChart = mountChart("chart", data);
+        const unmountChart = mountChart("line-chart", data);
         // FIXME: cannot remove listener on unmount
         // return(() => unmountChart());
     }, [])
@@ -18,7 +19,7 @@ const LineChart = () => {
             <CCardHeader>Line Chart</CCardHeader>
             <CCardBody  >
                 <select id="selectButton"></select>
-                <div id="chart" style={{ height: '400px' }}></div>
+                <div id="line-chart" style={{ height: '400px' }}></div>
             </CCardBody>
         </CCard>
     )
