@@ -25,7 +25,14 @@ def test_temperatures_valid_id():
     When he requests the temperatures for a valid location
     The the API should return all the hourly temperatures for that location
     """
-    pass
+    response = client.get("/api/v1/temperatures/1040200?start=2021-12-01T00:00:00&end=2021-12-02T00:00:00")
+    data = response.json()
+    data = data["data"]
+
+    assert response.status_code == 200
+    assert len(data) == 24
+    assert data[0][0] == 1.95
+
 
 def test_temperatures_invalid_id():
     """
