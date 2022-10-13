@@ -19,6 +19,10 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
+import { Pie } from "react-chartjs-2";
+import "chartjs-plugin-datalabels";
+import 'chart.js/auto';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CChartLine, CChartPie } from '@coreui/react-chartjs'
 import { getStyle, hexToRgba } from '@coreui/utils'
 import CIcon from '@coreui/icons-react'
@@ -59,24 +63,25 @@ const Dashboard = () => {
   const [suppliers, setSuppliers] = React.useState([]);
 
   const [tariffs, setTariffs] = React.useState([
-    {label: "Simples", value: "S"},
-    {label: "Bi-horária", value: "B"},
-    {label: "Tri-horária", value: "T"},
+    { label: "Simples", value: "S" },
+    { label: "Bi-horária", value: "B" },
+    { label: "Tri-horária", value: "T" },
   ]);
 
   const [location, setLocation] = React.useState("0");
   const [supplier, setSupplier] = React.useState("");
   const [tariff, setTariff] = React.useState("");
+  const [piedata, setPiedata] = React.useState(null);
 
   React.useEffect(() => {
     temperatureservice.get_locations()
     .then((res) => res.json())
     .then((res) => setLocations(res.data))
-
+    
     const loc = localStorage.getItem("location");
     const sup = localStorage.getItem("supplier");
     const tar = localStorage.getItem("tariff");
-    
+
     if (loc) setLocation(loc);
 
     if (sup) setSupplier(sup);
@@ -88,23 +93,23 @@ const Dashboard = () => {
   React.useEffect(() => {
     localStorage.setItem("location", location);
     billingservice.get_suppliers()
-    .then((res) => res.json())
-    .then((res) => {
-      let temp = res.data.map((s) => {
-        return {label: s, value: s}
+      .then((res) => res.json())
+      .then((res) => {
+        let temp = res.data.map((s) => {
+          return { label: s, value: s }
+        })
+        setSuppliers(temp);
       })
-      setSuppliers(temp);
-    })
   }, [location]);
 
   React.useEffect(() => {
     localStorage.setItem("supplier", supplier);
-    if(supplier) {
+    if (supplier) {
       billingservice.get_tariffs(supplier)
-      .then((res) => res.json())
-      .then((res) => {
-        setTariffs(res.data)  
-      })
+        .then((res) => res.json())
+        .then((res) => {
+          setTariffs(res.data)
+        })
     }
   }, [supplier]);
 
@@ -112,6 +117,67 @@ const Dashboard = () => {
     localStorage.setItem("tariff", tariff);
   }, [tariff]);
 
+  const changePie = (data) => {
+    // TODO: call this to match the request 
+    let sumData = {"OFF": 0, "ECO": 0, "COMFORT": 0};
+    for(let i = 0; i < data.length; i++) {
+      sumData[data['mode']] += 1;
+    }
+
+    setPiedata(
+      {
+        labels: ['OFF', 'ECO', 'COMFORT'],
+        datasets: [
+          {
+            label: 'Mode',
+            data: [sumData['OFF'], sumData['ECO'], sumData['COMFORT']],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      }
+    );
+  }
+
+
+  const getTotal = (piedata, value) => {
+    let sum = piedata.datasets[0].data.reduce(
+      (a, b) => a + b,
+      0
+    );
+    if ((value / sum * 100).toFixed(0) !== '0')
+      return (value / sum * 100).toFixed(0) + "%";
+    return null
+  };
+
+  const pieChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false
+      },
+      datalabels: {
+        color: "#2327a",
+        font: {
+          weight: "bold",
+          size: 16
+        },
+        padding: 6,
+        formatter: (value) => {
+          return getTotal(piedata, value);
+        }
+      }
+    },
+  }
 
   return (
     <>
@@ -123,33 +189,38 @@ const Dashboard = () => {
             [{ label: "Select location", value: 0 }, ...locations]
           }
         />
-        {location != 0 ? 
-        <CFormSelect
-          value={supplier}
-          onChange={(e) => setSupplier(e.target.value)}
-          options={
-            [{ label: "Select supplier", value: "" }, ...suppliers]
-          }
-        />
-        :<></>}
-        {supplier ? 
-        <CFormSelect
-          value={tariff}
-          onChange={(e) => setTariff(e.target.value)}
-          options={
-            [{ label: "Select tariff", value: "" }, ...tariffs]
-          }
-        />
-        : <></>}
+        {location != 0 ?
+          <CFormSelect
+            value={supplier}
+            onChange={(e) => setSupplier(e.target.value)}
+            options={
+              [{ label: "Select supplier", value: "" }, ...suppliers]
+            }
+          />
+          : <></>}
+        {supplier ?
+          <CFormSelect
+            value={tariff}
+            onChange={(e) => setTariff(e.target.value)}
+            options={
+              [{ label: "Select tariff", value: "" }, ...tariffs]
+            }
+          />
+          : <></>}
       </div>
 
       {
-        location != 0 && supplier != "" && tariff != "" 
-        ? 
-        <WidgetsDropdown location={location} supplier={supplier} tariff={tariff} /> 
-        : <h1>Please choose your preferences.</h1>
+        location != 0 && supplier != "" && tariff != ""
+          ?
+          <WidgetsDropdown location={location} supplier={supplier} tariff={tariff} />
+          : <h1>Please choose your preferences.</h1>
       }
-      
+
+      { piedata ? 
+        <Pie plugins={[ChartDataLabels]} options={pieChartOptions} data={piedata} style={{ maxHeight: 330, textAlign: "center", paddingTop: 15 }} />
+        : <> </>
+      }
+
       {/* <CCard className="mb-4">
         <CCardBody>
           <CRow>
