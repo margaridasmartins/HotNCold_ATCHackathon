@@ -50,7 +50,8 @@ export function mountChart(id, data) {
 
     // Format the data field
     data.forEach(function (d) {
-        d["Order Month"] = parseDate(d["Order Month"])
+        const parsed = parseDate(d["Order Month"]);
+        if (parsed) d["Order Month"] = parsed
     });
 
     // Filter the data to only include a single metric
@@ -62,7 +63,8 @@ export function mountChart(id, data) {
     // concentrations = An array of three objects, each of which contains an array of objects
     var concentrations = productCategories.map(function (category) {
         return {
-            category: category, datapoints: subset.map(function (d) {
+            category: category,
+            datapoints: subset.map(function (d) {
                 return { date: d["Order Month"], concentration: +d[category] }
             })
         }
@@ -95,6 +97,10 @@ export function mountChart(id, data) {
         .enter().append("g")
         .attr("class", "category");
 
+    console.log(concentrations[0].datapoints)
+    console.log(line(concentrations[0].datapoints))
+
+    // console.log(line(d.datapoints))
     products.append("path")
         .attr("fill", "none")
         .attr("class", "line")
@@ -103,8 +109,8 @@ export function mountChart(id, data) {
         .style("stroke-width", 2);
 
     // console.log(JSON.stringify(d3.values(concentrations), null, 2)) // to view the structure
-    console.log(Object.values(concentrations)); // to view the structure
-    console.log(concentrations);
+    // console.log(Object.values(concentrations)); // to view the structure
+    // console.log(concentrations);
     // console.log(concentrations.map(function()))
 
     // Define responsive behavior
