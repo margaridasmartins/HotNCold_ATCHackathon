@@ -63,7 +63,7 @@ python -m uvicorn main:app --reload
 
 1. Build Image
 ```
-sudo docker build -f Dockerfile -t api ..
+sudo docker build -f Dockerfile -t api .
 ```
 
 2. Run Container

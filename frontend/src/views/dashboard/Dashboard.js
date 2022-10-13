@@ -5,6 +5,7 @@ import {
   CButton,
   CButtonGroup,
   CCard,
+  CFormSelect,
   CCardBody,
   CCardFooter,
   CCardHeader,
@@ -44,144 +45,112 @@ import {
   cilUserFemale,
 } from '@coreui/icons'
 
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
-
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
+import { json } from 'react-router-dom'
+import billingservice from "../../services/BillingService.js";
+import temperatureservice from "../../services/TemperatureService.js";
 
 const Dashboard = () => {
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
-  const progressExample = [
-    { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
-    { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
-    { title: 'Pageviews', value: '78.706 Views', percent: 60, color: 'warning' },
-    { title: 'New Users', value: '22.123 Users', percent: 80, color: 'danger' },
-    { title: 'Bounce Rate', value: 'Average Rate', percent: 40.15, color: 'primary' },
-  ]
+  const [locations, setLocations] = React.useState([]);
 
-  const progressGroupExample1 = [
-    { title: 'Monday', value1: 34, value2: 78 },
-    { title: 'Tuesday', value1: 56, value2: 94 },
-    { title: 'Wednesday', value1: 12, value2: 67 },
-    { title: 'Thursday', value1: 43, value2: 91 },
-    { title: 'Friday', value1: 22, value2: 73 },
-    { title: 'Saturday', value1: 53, value2: 82 },
-    { title: 'Sunday', value1: 9, value2: 69 },
-  ]
+  const [suppliers, setSuppliers] = React.useState([]);
 
-  const progressGroupExample2 = [
-    { title: 'Male', icon: cilUser, value: 53 },
-    { title: 'Female', icon: cilUserFemale, value: 43 },
-  ]
+  const [tariffs, setTariffs] = React.useState([
+    {label: "Simples", value: "S"},
+    {label: "Bi-horária", value: "B"},
+    {label: "Tri-horária", value: "T"},
+  ]);
 
-  const progressGroupExample3 = [
-    { title: 'Organic Search', icon: cibGoogle, percent: 56, value: '191,235' },
-    { title: 'Facebook', icon: cibFacebook, percent: 15, value: '51,223' },
-    { title: 'Twitter', icon: cibTwitter, percent: 11, value: '37,564' },
-    { title: 'LinkedIn', icon: cibLinkedin, percent: 8, value: '27,319' },
-  ]
+  const [location, setLocation] = React.useState("0");
+  const [supplier, setSupplier] = React.useState("");
+  const [tariff, setTariff] = React.useState("");
 
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'USA', flag: cifUs },
-      usage: {
-        value: 50,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'Mastercard', icon: cibCcMastercard },
-      activity: '10 sec ago',
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Brazil', flag: cifBr },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'info',
-      },
-      payment: { name: 'Visa', icon: cibCcVisa },
-      activity: '5 minutes ago',
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'India', flag: cifIn },
-      usage: {
-        value: 74,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'warning',
-      },
-      payment: { name: 'Stripe', icon: cibCcStripe },
-      activity: '1 hour ago',
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'France', flag: cifFr },
-      usage: {
-        value: 98,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'danger',
-      },
-      payment: { name: 'PayPal', icon: cibCcPaypal },
-      activity: 'Last month',
-    },
-    {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Spain', flag: cifEs },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'primary',
-      },
-      payment: { name: 'Google Wallet', icon: cibCcApplePay },
-      activity: 'Last week',
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Poland', flag: cifPl },
-      usage: {
-        value: 43,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'Amex', icon: cibCcAmex },
-      activity: 'Last week',
-    },
-  ]
+  React.useEffect(() => {
+    temperatureservice.get_locations()
+    .then((res) => res.json())
+    .then((res) => setLocations(res.data))
+
+    const loc = localStorage.getItem("location");
+    const sup = localStorage.getItem("supplier");
+    const tar = localStorage.getItem("tariff");
+    
+    if (loc) setLocation(loc);
+
+    if (sup) setSupplier(sup);
+
+    if (tar) setTariff(tar);
+
+  }, []);
+
+  React.useEffect(() => {
+    localStorage.setItem("location", location);
+    billingservice.get_suppliers()
+    .then((res) => res.json())
+    .then((res) => {
+      let temp = res.data.map((s) => {
+        return {label: s, value: s}
+      })
+      setSuppliers(temp);
+    })
+  }, [location]);
+
+  React.useEffect(() => {
+    localStorage.setItem("supplier", supplier);
+    if(supplier) {
+      billingservice.get_tariffs(supplier)
+      .then((res) => res.json())
+      .then((res) => {
+        setTariffs(res.data)  
+      })
+    }
+  }, [supplier]);
+
+  React.useEffect(() => {
+    localStorage.setItem("tariff", tariff);
+  }, [tariff]);
+
 
   return (
     <>
-      <WidgetsDropdown />
-      <CCard className="mb-4">
+      <div style={{ margin: 20 }} >
+        <CFormSelect
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          options={
+            [{ label: "Select location", value: 0 }, ...locations]
+          }
+        />
+        {location != 0 ? 
+        <CFormSelect
+          value={supplier}
+          onChange={(e) => setSupplier(e.target.value)}
+          options={
+            [{ label: "Select supplier", value: "" }, ...suppliers]
+          }
+        />
+        :<></>}
+        {supplier ? 
+        <CFormSelect
+          value={tariff}
+          onChange={(e) => setTariff(e.target.value)}
+          options={
+            [{ label: "Select tariff", value: "" }, ...tariffs]
+          }
+        />
+        : <></>}
+      </div>
+
+      {
+        location != 0 && supplier != "" && tariff != "" 
+        ? 
+        <WidgetsDropdown location={location} supplier={supplier} tariff={tariff} /> 
+        : <h1>Please choose your preferences.</h1>
+      }
+      
+      {/* <CCard className="mb-4">
         <CCardBody>
           <CRow>
             <CCard className="mb-4">
@@ -476,7 +445,7 @@ const Dashboard = () => {
             </CCardBody>
           </CCard>
         </CCol>
-      </CRow>
+      </CRow> */}
     </>
   )
 }

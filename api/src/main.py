@@ -1,5 +1,6 @@
 import logging
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List
 from fastapi import Query
@@ -9,7 +10,7 @@ import os
 from utils import create_response
 
 from data import get_prices
-from algorithms import dead_hours, min_cost, best_ratio
+from algorithms import min_cost, best_ratio
 
 # Logger
 logging.basicConfig(
@@ -17,14 +18,15 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# Seperate prod from dev
-env = os.getenv("ENV", "DEV")
-if env == "PROD":
-    data_path = "data/"
-else:
-    data_path = "../../data/"
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/v1/optimize")
 def simple_request(
@@ -32,6 +34,7 @@ def simple_request(
         end: datetime.datetime,
         supplier: str,
         tariff: str = "S",
+        city: int = 1040200
     )-> JSONResponse:
     """
     Endpoint ``/optimize`` that accepts the method GET. Returns the best price for a minimum of 124 confort score.
@@ -44,24 +47,26 @@ def simple_request(
             The name of the supplier
         tariff: `str`
             The corresponding tariff type. Available "S", "B", "T"
+        city :  int
+            Temperature Location ID
     Returns
     -------
         response : `JSONResponse`
             Json response with the status code and data.
     """
     try:
-        temp_data = data_path + 'temperatureData.json'
         prices = get_prices(supplier, tariff)
 
         if len(prices) == 0:
             return create_response(status_code=400, message="Wrong billing type")
         
-        return create_response(status_code=200, data=min_cost(temp_data, prices, start, end))
+        return create_response(status_code=200, data=min_cost( prices, start, end, city))
         
     except BaseException as e:
         logging.debug(e)
         print(e)
         return create_response(status_code=400, message="Bad arguments")
+
 
 @app.get("/api/v1/bestratio")
 def simple_request(
@@ -69,6 +74,7 @@ def simple_request(
         end: datetime.datetime,
         supplier: str,
         tariff: str = "S",
+        city: int = 1040200
     )-> JSONResponse:
     """
     Endpoint ``/bestratio`` that accepts the method GET. Returns the best confort score / price ratio.
@@ -81,24 +87,26 @@ def simple_request(
             The name of the supplier
         tariff: `str`
             The corresponding tariff type. Available "S", "B", "T"
+        city :  int
+            Temperature Location ID
     Returns
     -------
         response : `JSONResponse`
             Json response with the status code and data.
     """
     try:
-        temp_data = data_path + 'temperatureData.json'
         prices = get_prices(supplier, tariff)
 
         if len(prices) == 0:
             return create_response(status_code=400, message="Wrong billing type")
         
-        return create_response(status_code=200, data=best_ratio(temp_data, prices, start, end))
+        return create_response(status_code=200, data=best_ratio(prices, start, end, city))
         
     except BaseException as e:
         logging.debug(e)
         print(e)
         return create_response(status_code=400, message="Bad arguments")
+
 
 @app.get("/api/v1/deadhours")
 def deadhours_request(
@@ -106,7 +114,8 @@ def deadhours_request(
         end: datetime.datetime,
         supplier: str,
         tariff: str = "S",
-        hours: List[int] = Query(...)
+        hours: List[int] = Query(...),
+        city: int = 1040200
     ) -> JSONResponse:
     """
     Endpoint ``/deadhours`` that accepts the method GET. Returns the best price for a minimum confort score of 124 considering dead hours,
@@ -122,24 +131,23 @@ def deadhours_request(
             The corresponding tariff type. Available "S", "B", "T"
         hours: `List[int]`
             The list with the dead hours
+        city :  int
+            Temperature Location ID
     Returns
     --------
         response : `JSONResponse`
             Json response with the status code and data.
     """
     try:
-        temp_data = data_path + 'temperatureData.json'
         prices = get_prices(supplier, tariff)
 
         if len(prices) == 0:
             return create_response(status_code=400, message="Wrong billing type")
         
 
-        return create_response(status_code=200, data=dead_hours(temp_data, prices, start, end, hours))
+        return create_response(status_code=200, data=min_cost(prices, start, end, city, hours))
         
     except BaseException as e:
         logging.debug(e)
         print(e)
         return create_response(status_code=400, message="Bad arguments")
-
-

@@ -15,16 +15,17 @@ logging.basicConfig(
 app = FastAPI()
 
 supliers = ["EDP", "GALP", "ENDESA"] # list of available suppliers
+tariffs = [{"label": "Simple", "value": "S"}, {"label": "Bi-Hour", "value": "B"}, {"label": "Tri-Hour", "value": "T"}] # list of available tariffs
 
 @app.get("/api/v1/billing")
-def simple_request(
+def get_billing(
         supplier:  str,
         tariff: str = "S",
     )-> JSONResponse:
     """
     Endpoint ``/billing`` that accepts the method GET. Returns the energy price for each hour of the day.
     Parameters:
-        supplier:
+        supplier: `str`
             The name of the supplier
         tariff: `str`
             The corresponding tariff type. Available "S", "B", "T"
@@ -62,3 +63,42 @@ def simple_request(
         return create_response(status_code=400, message="Bad arguments")
     
 
+@app.get("/api/v1/suppliers")
+def get_suppliers() -> JSONResponse:
+    """
+    Endpoint ``/suppliers`` that accepts the method GET. Returns a list of available suppliers
+    Returns
+    -------
+        response : `JSONResponse`
+            Json response with the status code and data.
+    """
+    try:
+        return create_response(status_code=200, data=supliers) 
+    except BaseException as e:
+        logging.debug(e)
+        print(e)
+        return create_response(status_code=400, message="Bad arguments")
+
+@app.get("/api/v1/tariffs/{supplier}")
+def get_tariffs(
+        supplier: str
+    ) -> JSONResponse:
+    """
+    Endpoint ``/tariffs`` that accepts the method GET. Returns a list of available 
+    types of tariffs for the given supplier.
+    Parameters:
+        supplier: `str`
+            The name of the supplier
+    Returns
+    -------
+        response : `JSONResponse`
+            Json response with the status code and data.
+    """
+    try:
+        if supplier in supliers:
+            return create_response(status_code=200, data=tariffs) 
+        return create_response(status_code=404, message="Supplier not found")
+    except BaseException as e:
+        logging.debug(e)
+        print(e)
+        return create_response(status_code=400, message="Bad arguments")
