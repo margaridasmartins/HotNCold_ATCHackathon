@@ -18,6 +18,14 @@
     ```
     /api/v1/suppliers
     ```
+- /api/v1/tariffs/{supplier} - GET
+    - Gives a list of available tariff types for a given supplier
+    - Parameters:
+        - Supplier - the name of the energy suplier
+    Example
+    ```
+    /api/v1/tariffs/GALP
+    ```
 
 ## Local Instalation
 
