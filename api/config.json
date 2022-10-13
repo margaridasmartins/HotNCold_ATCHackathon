@@ -1,0 +1,57 @@
+{
+    "OFF": {
+        "confort_score": 0,
+        "temp_intervals" : [
+            {
+                "min_temp": -100,
+                "max_temp": 100,
+                "kw": 1
+            }
+        ]
+    },
+    "ECO": {
+        "confort_score": 4,
+        "temp_intervals" : [
+            {
+                "min_temp": -100,
+                "max_temp": 10,
+                "kw": 1.6
+            },
+            {
+                "min_temp": 10,
+                "max_temp": 20,
+                "kw": 0.8
+            },
+            {
+                "min_temp": 20,
+                "max_temp": 100,
+                "kw": 0.4
+            }
+        ]
+    },
+    "CONFORT": {
+        "confort_score": 8,
+        "temp_intervals" : [
+            {
+                "min_temp": -100,
+                "max_temp": 0,
+                "kw": 11.4
+            },
+            {
+                "min_temp": 0,
+                "max_temp": 10,
+                "kw": 2.4
+            },
+            {
+                "min_temp": 10,
+                "max_temp": 20,
+                "kw": 1.6
+            },
+            {
+                "min_temp": 20,
+                "max_temp": 100,
+                "kw": 0.8
+            }
+        ]
+    }
+}
