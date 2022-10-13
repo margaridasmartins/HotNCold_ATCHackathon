@@ -23,6 +23,5 @@ const data = [
     { "time": "2021-12-01T21:00:00+00:00", "mode": "ECO", "c_score": 152, "kwh": 1.8, "cost": 1.5, "temperature": 16 },
     { "time": "2021-12-01T22:00:00+00:00", "mode": "ECO", "c_score": 156, "kwh": 1.2, "cost": 0.6, "temperature": 16 },
     { "time": "2021-12-01T23:00:00+00:00", "mode": "ECO", "c_score": 160, "kwh": 1.2, "cost": 0.6, "temperature": 15 },
-    { "metric": "Sales", "Order Month": "2014-12-01 00:00:00", "Furniture": "0.6198492908595687", "Office-Supplies": "0.7436327438088823", "Technology": "0.6219558096338558" }
 ]
 export default data

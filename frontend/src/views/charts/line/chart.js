@@ -2,7 +2,14 @@
 import * as d3 from "d3"
 import "src/utils/resizeListener"
 
-export function mountChart(id, data) {
+
+var svg, concentrations, products, productCategories;
+var xScale, tempScale, yScale, xAxis, tempAxis, yAxis;
+var width, height;
+var currCategory, hoverCategory;
+var line, tempLine;
+
+export function mount(id, data) {
 
     var parent = d3.select(`#${id}`);
     if (parent.empty()) throw new Error(`Element with ID ${id} not found`);
@@ -19,9 +26,9 @@ export function mountChart(id, data) {
         .on("touchstart", event => event.preventDefault());
 
     // Define margins
-    var margin = { top: 20, right: 50, bottom: 30, left: 50 },
-        width = parseInt(parent.style("width")) - margin.left - margin.right,
-        height = parseInt(parent.style("height")) - margin.top - margin.bottom;
+    const margin = { top: 20, right: 50, bottom: 30, left: 50 };
+    width = parseInt(parent.style("width")) - margin.left - margin.right;
+    height = parseInt(parent.style("height")) - margin.top - margin.bottom;
 
     // Format the data field
     data.forEach(function (d) {
@@ -30,39 +37,38 @@ export function mountChart(id, data) {
     });
 
     // Define svg canvas
-    var svg = parent
+    svg = parent
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // Set the color domain equal to the three product categories
-    var productCategories = Object.keys(data[0])
+    productCategories = Object.keys(data[0])
         .filter(function (key) { return (key !== "time") && (key !== "temperature") && (key !== "mode") });
 
     // Define scales
-    var xScale = d3.scaleTime().range([0, width]);
-    var tempScale = d3.scaleLinear().range([height, 0]);
-    var yScale = productCategories.reduce((acc, key) => (
+    xScale = d3.scaleTime().range([0, width]);
+    tempScale = d3.scaleLinear().range([height, 0]);
+    yScale = productCategories.reduce((acc, key) => (
         acc[key] = d3.scaleLinear().range([height, 0]), acc), {})
 
     // Define axes
-    var xAxis = d3.axisBottom(xScale);
-    var tempAxis = d3.axisLeft(tempScale);
-    var yAxis = productCategories.reduce((acc, key) => (
+    xAxis = d3.axisBottom(xScale);
+    tempAxis = d3.axisLeft(tempScale);
+    yAxis = productCategories.reduce((acc, key) => (
         acc[key] = d3.axisRight(yScale[key]), acc), {})
 
-    var currCategory = productCategories[0];
-    var hoverCategory;
+    currCategory = productCategories[0];
 
     // Define lines
 
-    const tempLine = d3.line()
+    tempLine = d3.line()
         .x(function (d) { return xScale(d["time"]); })
         .y(function (d) { return tempScale(d["temperature"]); })
         .curve(d3.curveBasis)
 
-    const line = productCategories.reduce((acc, key) => (
+    line = productCategories.reduce((acc, key) => (
         acc[key] = d3.line()
             .x(function (d) { return xScale(d["time"]); })
             .y(function (d) { return yScale[key](d["concentration"]); })
@@ -72,84 +78,7 @@ export function mountChart(id, data) {
 
     // console.log(JSON.stringify(data, null, 2)) // to view the structure
 
-
-
-    // Filter the data to only include a single metric
-    var subset = data.filter(function (el) { return true });
-    // console.log(JSON.stringify(subset, null, 2))
-
-    // Reformat data to make it more copasetic for d3
-    // data = An array of objects
-    // concentrations = An array of three objects, each of which contains an array of objects
-    var concentrations = productCategories.map(function (category) {
-        return {
-            category: category,
-            datapoints: subset.map(function (d) {
-                return { time: d["time"], concentration: +d[category] }
-            })
-        }
-    })
-    console.log(JSON.stringify(concentrations, null, 2)) // to view the structure
-
-    // Set the domain of the axes
-    xScale.domain(d3.extent(subset, d => d["time"]));
-    tempScale.domain(d3.extent(subset, d => d["temperature"]));
-    Object.values(yScale).forEach((scale, index) =>
-        scale.domain([0, d3.max(concentrations[index].datapoints, d => d.concentration)])); TODO:
-
-    Object.values(yScale).forEach((scale, index) => console.log([0, d3.max(concentrations[index].datapoints, d => d.concentration)])); TODO:
-
-    // var zDomain = new d3.InternSet(d3.map(subset, d => d.metric));
-    // console.log(zDomain)
-
-    // Place the axes on the chart
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", `translate(0, ${height})`)
-        .call(xAxis);
-
-    svg.append("g")
-        .attr("class", "t axis")
-        .call(tempAxis);
-
-    productCategories.forEach(d =>
-        svg.append("g")
-            .attr("class", `y axis ${d}`)
-            .attr("transform", `translate(${width}, 0)`)
-            .style("opacity", d === currCategory ? 0 : 0)
-            .call(yAxis[d])
-    )
-    // .append("text")
-    // .attr("class", "label")
-    // .attr("y", 6)
-    // .attr("dy", ".71em")
-    // .attr("dx", ".71em")
-    // .style("text-anchor", "beginning")
-    // .text("Product Concentration");
-
-    svg.append("g")
-        .attr("class", "notcategory temperature")
-        .append("path")
-        .attr("d", tempLine(data))
-        .attr("fill", "#99999922")
-        .attr("class", "notline")
-        .attr("stroke", "#99999966")
-        .style("stroke-width", 2)
-
-    const products = svg.selectAll(".category")
-        .data(concentrations)
-        .enter().append("g")
-        .attr("class", d => `category ${d.category}`);
-
-    products.append("path")
-        .attr("fill", "none")
-        .attr("class", "line")
-        .style("stroke-width", 2)
-
-    // console.log(JSON.stringify(d3.values(concentrations), null, 2)) // to view the structure
-    // console.log(Object.values(concentrations)); // to view the structure
-    // console.log(concentrations);
-    // console.log(concentrations.map(function()))
+    update(data);
 
     function click(event) {
         currCategory = hoverCategory;
@@ -204,8 +133,8 @@ export function mountChart(id, data) {
 
     // Define responsive behavior
     function resize() {
-        var width = parseInt(parent.style("width")) - margin.left - margin.right,
-            height = parseInt(parent.style("height")) - margin.top - margin.bottom;
+        width = parseInt(parent.style("width")) - margin.left - margin.right;
+        height = parseInt(parent.style("height")) - margin.top - margin.bottom;
 
         // Update the range of the scale with new width/height
         xScale.range([0, width]);
@@ -254,4 +183,98 @@ export function mountChart(id, data) {
         // Remove the listener
         removeResizeListener(el, resize)
     })
+}
+
+
+
+// Create a function that takes a dataset as input and update the plot:
+export function update(data) {
+    console.log("lkjd")
+
+    // Reformat data to make it more copasetic for d3
+    // data = An array of objects
+    // concentrations = An array of three objects, each of which contains an array of objects
+    concentrations = productCategories.map(category => ({
+        category: category,
+        datapoints: data.map(function (d) {
+            return { time: d["time"], concentration: +d[category] }
+        })
+    }))
+    console.log(JSON.stringify(concentrations, null, 2)) // to view the structure
+
+    // Set the domain of the axes
+    xScale.domain(d3.extent(data, d => d["time"]));
+    tempScale.domain(d3.extent(data, d => d["temperature"]));
+    Object.values(yScale).forEach((scale, index) =>
+        scale.domain([0, d3.max(concentrations[index].datapoints, d => d.concentration)]));
+
+    // Place the axes on the chart
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", `translate(0, ${height})`)
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "t axis")
+        .call(tempAxis);
+
+    productCategories.forEach(d =>
+        svg.append("g")
+            .attr("class", `y axis ${d}`)
+            .attr("transform", `translate(${width}, 0)`)
+            .style("opacity", d === currCategory ? 0 : 0)
+            .call(yAxis[d])
+    )
+    // .append("text")
+    // .attr("class", "label")
+    // .attr("y", 6)
+    // .attr("dy", ".71em")
+    // .attr("dx", ".71em")
+    // .style("text-anchor", "beginning")
+    // .text("Product Concentration");
+
+    // Place the lines
+    svg.append("g")
+        .attr("class", "notcategory temperature")
+        .append("path")
+        .attr("d", tempLine(data))
+        .attr("fill", "none")
+        .attr("class", "notline")
+        .attr("stroke", "#99999966")
+        .style("stroke-width", 2)
+
+    products = svg.selectAll(".category")
+        .data(concentrations)
+        .enter().append("g")
+        .attr("class", d => `category ${d.category}`);
+
+    products.append("path")
+        .attr("fill", "none")
+        .attr("class", "line")
+        .style("stroke-width", 2)
+
+    // // create the Y axis
+    // y.domain([0, d3.max(data, function (d) { return d.ser2 })]);
+    // svg.selectAll(".y.axis")
+    //     .transition()
+    //     .duration(2000)
+    //     .call(yAxis);
+
+    // // Create a update selection: bind to the new data
+    // var u = svg.selectAll(".lineTest")
+    //     .data([data], function (d) { return d.ser1 });
+
+    // // Updata the line
+    // u
+    //     .enter()
+    //     .append("path")
+    //     .attr("class", "lineTest")
+    //     .merge(u)
+    //     .transition()
+    //     .duration(2000)
+    //     .attr("d", d3.line()
+    //         .x(function (d) { return x(d.ser1); })
+    //         .y(function (d) { return y(d.ser2); }))
+    //     .attr("fill", "none")
+    //     .attr("stroke-width", 2.5)
 }

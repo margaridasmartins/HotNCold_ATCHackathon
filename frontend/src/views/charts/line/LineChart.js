@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { CCard, CCardBody, CCardHeader } from '@coreui/react'
 
-import { mountChart } from "./chart"
+import { mount, update } from "./chart"
 import data from "./data"
 import './styles.css'
 
@@ -9,9 +9,11 @@ import './styles.css'
 const LineChart = () => {
 
     useEffect(() => {
-        const unmountChart = mountChart("line-chart", data);
+        const unmount = mount("line-chart", data);
+
+        setTimeout(() => update(data), 5000)
         // FIXME: cannot remove listener on unmount
-        // return(() => unmountChart());
+        // return(() => unmount());
     }, [])
 
     return (
