@@ -11,7 +11,8 @@ const LineChart = () => {
     useEffect(() => {
         const unmount = mount("line-chart", data);
 
-        setTimeout(() => update(data), 5000)
+        setTimeout(() => update(data.slice(0, -10)), 5000)
+        setTimeout(() => update(data), 10000)
         // FIXME: cannot remove listener on unmount
         // return(() => unmount());
     }, [])

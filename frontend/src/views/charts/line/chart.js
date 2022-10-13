@@ -3,7 +3,7 @@ import * as d3 from "d3"
 import "src/utils/resizeListener"
 
 
-var svg, concentrations, products, productCategories;
+var svg, concentrations, productCategories;
 var xScale, tempScale, yScale, xAxis, tempAxis, yAxis;
 var width, height;
 var currCategory, hoverCategory;
@@ -30,11 +30,12 @@ export function mount(id, data) {
     width = parseInt(parent.style("width")) - margin.left - margin.right;
     height = parseInt(parent.style("height")) - margin.top - margin.bottom;
 
-    // Format the data field
-    data.forEach(function (d) {
-        const parsed = d3.isoParse(d["time"]);
-        if (parsed) d["time"] = parsed
-    });
+    // Add clip
+    parent.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height)
 
     // Define svg canvas
     svg = parent
@@ -101,7 +102,7 @@ export function mount(id, data) {
 
         hoverCategory = cc.category;
 
-        products
+        d3.selectAll(".category")
             .style("opacity", d => [currCategory, hoverCategory].includes(d.category) ? 1 : 0.5)
             .filter(d => d.category === hoverCategory)
             .raise();
@@ -118,7 +119,7 @@ export function mount(id, data) {
     }
 
     function pointerleft() {
-        products
+        d3.selectAll(".category")
             .style("opacity", d => d.category === currCategory ? 1 : 0.5)
             .filter(d => d.category === currCategory)
             .raise();
@@ -185,11 +186,18 @@ export function mount(id, data) {
     })
 }
 
-
+var prevData = [],
+    prevConcentrations = [];
 
 // Create a function that takes a dataset as input and update the plot:
 export function update(data) {
     console.log("lkjd")
+
+    // Format the data field
+    data.forEach(function (d) {
+        const parsed = d3.isoParse(d["time"]);
+        if (parsed) d["time"] = parsed
+    });
 
     // Reformat data to make it more copasetic for d3
     // data = An array of objects
@@ -202,29 +210,63 @@ export function update(data) {
     }))
     console.log(JSON.stringify(concentrations, null, 2)) // to view the structure
 
+
+    if (prevData.length < data.length) {
+        // Update line before domain update
+        svg.selectAll(".category")
+            .data(concentrations)
+            .select('path')
+            .transition()
+            .duration(2000)
+            .attr("d", d => line[d.category](d.datapoints));
+
+        svg.select(".notcategory")
+            .select('path')
+            .transition()
+            .duration(2000)
+            .attr("d", tempLine(data))
+    }
+
     // Set the domain of the axes
     xScale.domain(d3.extent(data, d => d["time"]));
     tempScale.domain(d3.extent(data, d => d["temperature"]));
     Object.values(yScale).forEach((scale, index) =>
-        scale.domain([0, d3.max(concentrations[index].datapoints, d => d.concentration)]));
+        scale.domain([0, d3.max(concentrations[index].datapoints, d => d.concentration)*1.1]));
+
 
     // Place the axes on the chart
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", `translate(0, ${height})`)
+    var xAxisNode = svg.select(".x.axis")
+    if (xAxisNode.empty()) {
+        xAxisNode = svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", `translate(0, ${height})`)
+    }
+    xAxisNode.transition()
+        .duration(2000)
         .call(xAxis);
 
-    svg.append("g")
-        .attr("class", "t axis")
+    var tAxisNode = svg.select(".t.axis")
+    if (tAxisNode.empty()) {
+        tAxisNode = svg.append("g")
+            .attr("class", "t axis")
+    }
+    tAxisNode.transition()
+        .duration(2000)
         .call(tempAxis);
 
-    productCategories.forEach(d =>
-        svg.append("g")
-            .attr("class", `y axis ${d}`)
-            .attr("transform", `translate(${width}, 0)`)
-            .style("opacity", d === currCategory ? 0 : 0)
+    productCategories.forEach(d => {
+        let yAxisNode = svg.select(`.y.axis.${d}`)
+        if (yAxisNode.empty()) {
+            yAxisNode = svg.append("g")
+                .attr("class", `y axis ${d}`)
+                .attr("transform", `translate(${width}, 0)`)
+            // .style("opacity", d === currCategory ? 1 : 0)
+
+        }
+        yAxisNode.transition()
+            .duration(2000)
             .call(yAxis[d])
-    )
+    })
     // .append("text")
     // .attr("class", "label")
     // .attr("y", 6)
@@ -234,33 +276,58 @@ export function update(data) {
     // .text("Product Concentration");
 
     // Place the lines
-    svg.append("g")
-        .attr("class", "notcategory temperature")
-        .append("path")
-        .attr("d", tempLine(data))
-        .attr("fill", "none")
-        .attr("class", "notline")
-        .attr("stroke", "#99999966")
-        .style("stroke-width", 2)
 
-    products = svg.selectAll(".category")
+    let tempLineNode = svg.select(".notcategory")
+
+    if (tempLineNode.empty()) {
+        svg.append("g")
+            .attr("class", "notcategory temperature")
+            .append("path")
+            .attr("clip-path", "url(#clip)")
+            .attr("d", tempLine(data))
+            .attr("fill", "none")
+            .attr("class", "notline")
+            .attr("stroke", "#99999966")
+            .style("stroke-width", 2)
+    } else {
+        tempLineNode
+            .select('path')
+            .transition()
+            .duration(2000)
+            .attr("d", tempLine(data))
+    }
+
+    let products = svg.selectAll(".category")
         .data(concentrations)
-        .enter().append("g")
-        .attr("class", d => `category ${d.category}`);
 
-    products.append("path")
+    products
+        .select('path')
+        .transition()
+        .duration(2000)
+        .attr("d", d => line[d.category](d.datapoints));
+
+    products
+        .enter().append("g")
+        .attr("class", d => `category ${d.category}`)
+        .append("path")
+        .attr("clip-path", "url(#clip)")
         .attr("fill", "none")
         .attr("class", "line")
         .style("stroke-width", 2)
+        .merge(products)
+        .transition()
+        .duration(2000)
+        .attr("d", d => line[d.category](d.datapoints));
+
+    //-----------------------
 
     // // create the Y axis
-    // y.domain([0, d3.max(data, function (d) { return d.ser2 })]);
     // svg.selectAll(".y.axis")
     //     .transition()
     //     .duration(2000)
     //     .call(yAxis);
 
-    // // Create a update selection: bind to the new data
+    // Create a update selection: bind to the new data
     // var u = svg.selectAll(".lineTest")
     //     .data([data], function (d) { return d.ser1 });
 
@@ -275,6 +342,7 @@ export function update(data) {
     //     .attr("d", d3.line()
     //         .x(function (d) { return x(d.ser1); })
     //         .y(function (d) { return y(d.ser2); }))
-    //     .attr("fill", "none")
-    //     .attr("stroke-width", 2.5)
+
+    prevData = data;
+    prevConcentrations = concentrations;
 }
