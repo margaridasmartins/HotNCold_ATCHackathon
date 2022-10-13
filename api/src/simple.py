@@ -1,12 +1,12 @@
-import json
+from datetime import datetime
+from time import strptime
 
-def simple(data_path, price, start=0, end=744):
-    f = open(data_path)
-    data = json.loads(f.read())
-    f.close()
+from data import get_data, get_prices
+
+def simple(data_path, prices, start, end):
+    
+    temps = get_data(data_path, start, end)
   
-    temps = [(x['airTemperature'], x['time']) for x in data[start:end]]
-
     c_score = 0
     kw = 0
     total_price = 0
@@ -14,13 +14,12 @@ def simple(data_path, price, start=0, end=744):
     data = []
 
     for t, time in temps:
+        price = prices[datetime.fromisoformat(time[:-6]).hour]
         if t<0:
             c_score += 4
             kw += 1.6
             total_price += price * 1.6
             data.append({'time':time, 'mode': 'ECO', 'c_score': 4, 'kwh': 1.6, 'total_c_score': c_score, 'total_kwh': kw, 'temp': t, 'total_cost':total_price})
-            
-
         elif t<10:
             c_score += 8
             kw += 2.4
@@ -39,6 +38,7 @@ def simple(data_path, price, start=0, end=744):
             total_price += price * 0.8 
             data.append({'time':time, 'mode': 'COMFORT', 'c_score': 8, 'kwh': 0.8, 'total_c_score': c_score, 'total_kwh': kw, 'temp': t, 'total_cost':total_price})
 
+    #print(data)
     return data
 
 
