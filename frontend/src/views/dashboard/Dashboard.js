@@ -147,7 +147,7 @@ const Dashboard = () => {
         location != 0 && supplier != "" && tariff != "" 
         ? 
         <WidgetsDropdown location={location} supplier={supplier} tariff={tariff} /> 
-        : <h1>Please choose your preferences.</h1>
+        : <h1 style={{margin: 20}}>Please choose your preferences.</h1>
       }
       
       {/* <CCard className="mb-4">
