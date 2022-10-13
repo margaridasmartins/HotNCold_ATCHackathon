@@ -12,7 +12,7 @@ import { getStyle } from '@coreui/utils'
 import { CChartBar, CChartLine } from '@coreui/react-chartjs'
 import apiservice from '../../services/ApiService.js';
 
-const WidgetsDropdown = ({location}) => {   //TODO: provide supplier and tariff
+const WidgetsDropdown = ({location, supplier, tariff}) => {
 
   const TEMPERATURE = 0;
   const MODE = 1;
@@ -20,14 +20,14 @@ const WidgetsDropdown = ({location}) => {   //TODO: provide supplier and tariff
   const KWH = 3;
 
   const [data, setData] = React.useState([
-    { value: "Temperature", title: "Temperature", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "primary" },
-    { value: "Lixo1", title: "Mode", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "danger" },
-    { value: "Lixo2", title: "Cost", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "warning" },
-    { value: "Lixo3", title: "Energy", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "success" },
+    { value: "", title: "Temperature", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "primary" },
+    { value: "", title: "Mode", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "danger" },
+    { value: "", title: "Cost", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "warning" },
+    { value: "", title: "Energy", chartData: [1, 2, 3, 4, 5], chartLabels: [1, 2, 3, 4, 5], color: "success" },
   ]);
   
   React.useEffect(() => {
-    apiservice.get_last_24h("1040200", "EDP", "S")
+    apiservice.get_last_24h("1040200", supplier, tariff)    // TODO: hardcoded city
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
@@ -60,7 +60,6 @@ const WidgetsDropdown = ({location}) => {   //TODO: provide supplier and tariff
 
     setData(temp);
   }
-
 
   return (
     <CRow>
