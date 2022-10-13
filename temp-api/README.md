@@ -43,6 +43,11 @@ cd src
 python -m uvicorn main:app --reload --port 8002
 ```
 
+4. Testing
+```
+pytest
+```
+
 ## Docker Instalation
 
 1. Build Image

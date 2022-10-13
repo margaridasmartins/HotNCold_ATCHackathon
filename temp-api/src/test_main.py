@@ -1,4 +1,3 @@
-from urllib import response
 from fastapi.testclient import TestClient
 import os
 from .main import app
