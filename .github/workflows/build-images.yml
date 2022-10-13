@@ -21,7 +21,7 @@ jobs:
 #         password: "${{ secrets.DOCKERHUB_TOKEN }}"
     - name: Docker login
       env:
-        DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       run: |
         docker login --username hotncold --password $DOCKERHUB_TOKEN
     - name: Build Docker Main API image
