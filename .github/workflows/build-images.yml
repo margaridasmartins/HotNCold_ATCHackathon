@@ -35,7 +35,7 @@ jobs:
     - name: Build Docker Billing API image
       run: |
         cd billing-api
-        docker build . --file Dockerfile --tag billing_ap~i:latest
+        docker build . --file Dockerfile --tag billing_api:latest
     - name: Build Docker Temp API image
       run: |
         cd temp-api
