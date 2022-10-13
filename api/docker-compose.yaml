@@ -6,8 +6,10 @@ services:
       - 8000:8000
   # still need frontend image
   frontend:
-    image: ghcr.io/brunosbastos/es_tdg/frontend:latest
+    image: hnc_frontend:latest
     links:
-      - api1
-      - api2
-      - api3
+      - backend
+    environment:
+      # add ENVs here
+    ports:
+      - 80:80
