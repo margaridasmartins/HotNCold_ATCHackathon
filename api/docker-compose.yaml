@@ -13,12 +13,12 @@ services:
     ports:
       - 8002:8002
   frontend:
-    image: hnc_frontend:latest
+    image: frontend:latest
     links:
       - api
       - billing
       - temp
     environment:
-      # add ENVs here
+      - HOST_NAME=46.101.92.174
     ports:
       - 80:80
