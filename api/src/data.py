@@ -4,15 +4,15 @@ import os
 import requests
 from datetime import datetime
 
-if os.get("TEMP_API"):
-    temp_api = os.get("TEMP_API")
+if os.getenv("TEMP_API"):
+    temp_api = os.getenv("TEMP_API")
 else:
     temp_api = "localhost"
 
-if os.get("BILL_API"):
-    bill_api = os.get("BILL_API")
+if os.getenv("BILL_API"):
+    bill_api = os.getenv("BILL_API")
 else:
-    bill_api = os.get("BILL_API")
+    bill_api = os.getenv("BILL_API")
 
 
 def get_prices(supplier: str, tariff: str) -> list:
