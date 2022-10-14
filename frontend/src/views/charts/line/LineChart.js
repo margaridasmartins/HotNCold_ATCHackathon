@@ -12,7 +12,7 @@ import { update as update2 } from "./chart2"
 
 import './styles.css'
 
-const LineChart = ({ showTimePeriod, showNothing, showData2, cumulativeOut = null }) => {
+const LineChart = ({ showTimePeriod, showNothing, showData2, cumulativeOut = null, myData }) => {
     const [cumulative, setCumulative] = useState('independent');
     const timePeriod = useStore(state => state.timePeriod)
     const data = useStore(state => state.data),
@@ -24,13 +24,13 @@ const LineChart = ({ showTimePeriod, showNothing, showData2, cumulativeOut = nul
     }
 
     useEffect(() => {
-        console.log(showData2, cumulativeOut, (cumulativeOut ? cumulativeOut : cumulative))
-
         const up = showData2 ? update2 : update;
 
-        up(showData2 ? "line-chart2" : "line-chart", showData2 ? data2 : data,
+        const daata = myData ? myData : showData2 ? data2 : data;
+
+        up(showData2 ? "line-chart2" : "line-chart", daata,
             (cumulativeOut ? cumulativeOut : cumulative) === 'cumulative');
-    }, [data, data2, cumulative, cumulativeOut])
+    }, [data, data2, cumulative, cumulativeOut, myData])
 
     return (
         <CCard className="mb-4 w-100">
