@@ -9,7 +9,7 @@ class BillingService {
     }
 
     get_tariffs(supplier) {
-        return fetch(`http://46.101.92.174/api/v2/billing/${supplier}`, {
+        return fetch(`http://46.101.92.174/api/v2/tariffs/${supplier}`, {
             method: 'GET',
             mode: 'cors',
         })
