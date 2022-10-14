@@ -5,10 +5,9 @@ import { DateRangePicker } from 'rsuite';
 
 import { useStore } from "src/store/useStore"
 import apiService from "src/services/ApiService"
-import { mount, update } from "./chart"
+import { update } from "./chart"
 import './styles.css'
 
-var mounted = false;
 const LineChart = () => {
     const [cumulative, setCumulative] = useState('independent');
     const timePeriod = useStore(state => state.timePeriod)
@@ -19,10 +18,11 @@ const LineChart = () => {
         currCategory = useStore(state => state.currCategory);
 
     const fetchData = (timePeriod) => {
+        useStore.getState().setTimePeriod(timePeriod)
+        
         function convertDateToFormat(d) {
             return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
         }
-        useStore.getState().setTimePeriod(timePeriod)
         const [start, end] = timePeriod;
 
         apiService.get_data(location, convertDateToFormat(start), convertDateToFormat(end), supplier, tariff)
@@ -53,7 +53,7 @@ const LineChart = () => {
                         onChange={(v) => fetchData(v)}
                     />
                     <CFormSelect
-                        style={{ width: 250, margin: 5 }}
+                        style={{ width: 250 }}
                         value={cumulative}
                         onChange={(e) => { setCumulative(e.target.value) }}
                         options={[
@@ -62,7 +62,7 @@ const LineChart = () => {
                         ]}
                     />
                     <CFormSelect
-                        style={{ width: 250, margin: 5 }}
+                        style={{ width: 250 }}
                         value={currCategory}
                         onChange={(e) => { useStore.getState().setCurrCategory(e.target.value) }}
                         options={[
@@ -72,10 +72,7 @@ const LineChart = () => {
                         ]}
                     />
                 </div>
-
-
-                <select id="selectButton"></select>
-                <div id="line-chart" style={{ height: '400px' }}></div>
+                <div id="line-chart" style={{ height: '500px' }}></div>
             </CCardBody>
         </CCard>
     )

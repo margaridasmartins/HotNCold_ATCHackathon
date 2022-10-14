@@ -10,11 +10,13 @@ var width, height;
 var currCategory = useStore.getState().currCategory, hoverCategory;
 var line, tempLine;
 
+const margin = { top: 20, right: 70, bottom: 60, left: 70 };
+
 export function mount(id, data) {
     const unsub = useStore.subscribe(
         (s) => {
             currCategory = s.currCategory;
-            resize()
+            resize(id, data)
         },
         (state) => state.currCategory,
     )
@@ -34,7 +36,6 @@ export function mount(id, data) {
         .on("touchstart", event => event.preventDefault());
 
     // Define margins
-    const margin = { top: 20, right: 50, bottom: 30, left: 50 };
     // console.log(parent, parent.style("width"))
     // width = parseInt(parent.style("width")) - margin.left - margin.right;
     // height = parseInt(parent.style("height")) - margin.top - margin.bottom;
@@ -132,62 +133,10 @@ export function mount(id, data) {
         // svg.dispatch("input", { bubbles: true });
     }
 
-
-
-    // Define responsive behavior
-    function resize() {
-        const pel = document.getElementById(id)
-        width = parseInt(pel.offsetWidth) - margin.left - margin.right;
-        height = parseInt(pel.offsetHeight) - margin.top - margin.bottom;
-
-        // Update the range of the scale with new width/height
-        xScale.range([0, width]);
-        tempScale.range([height, 0])
-        Object.values(yScale).forEach(scale => scale.range([height, 0]))
-
-        parent.select("defs").select("clipPath")
-            .select("rect")
-            .attr("width", width)
-            .attr("height", height)
-
-        parent
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-
-        // Update the axis and text with the new scale
-        svg.select('.x.axis')
-            .attr("transform", `translate(0, ${height})`)
-            .call(xAxis);
-
-        productCategories.forEach(d =>
-            svg.select(`.y.axis.${d}`)
-                .attr("transform", `translate(${width}, 0)`)
-                .style("opacity", d === currCategory ? 1 : 0)
-                .call(yAxis[d])
-        )
-
-        // Force D3 to recalculate and update the line
-        svg.selectAll('.line')
-            .style("stroke-dasharray", d => d.category === currCategory ? null : "3,3")
-            .attr("d", d => line[d.category](d.datapoints));
-
-        svg.select('.notline')
-            .attr("d", tempLine(data));
-
-        // Update the tick marks
-        xAxis.ticks(Math.max(width / 75, 2));
-        tempAxis.ticks(Math.max(height / 50, 2));
-        Object.values(yAxis).forEach(axis => axis.ticks(Math.max(height / 50, 2)))
-    };
-
     const el = document.getElementById(id);
 
     // Call the resize function whenever a resize event occurs
     addResizeListener(el, resize)
-
-    // Call the resize function
-    resize()
-    pointerleft();
 
     return (function () {
         // Remove the listener
@@ -195,15 +144,76 @@ export function mount(id, data) {
     })
 }
 
+// Define responsive behavior
+function resize(id, data) {
+    console.log(currCategory)
+    const pel = document.getElementById(id)
+    width = parseInt(pel.offsetWidth) - margin.left - margin.right;
+    height = parseInt(pel.offsetHeight) - margin.top - margin.bottom;
+
+    // Update the range of the scale with new width/height
+    xScale.range([0, width]);
+    tempScale.range([height, 0])
+    Object.values(yScale).forEach(scale => scale.range([height, 0]))
+
+    parent.select("defs").select("clipPath")
+        .select("rect")
+        .attr("width", width)
+        .attr("height", height)
+
+    parent
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+
+    // Update the axis and text with the new scale
+    svg.select('.x.axis')
+        .attr("transform", `translate(0, ${height})`)
+        .call(xAxis);
+
+    productCategories.forEach(d => {
+        console.log(currCategory, d, d === currCategory ? 1 : 0)
+        svg.select(`.y.axis.${d}`)
+            .attr("transform", `translate(${width}, 0)`)
+            .style("opacity", () => { console.log("wtf", d === currCategory ? 1 : 0); return d === currCategory ? 1 : 0 })
+            .call(yAxis[d])
+    })
+
+    // Force D3 to recalculate and update the line
+    svg.selectAll('.line')
+        .style("stroke-dasharray", d => d.category === currCategory ? null : "3,3")
+        .attr("d", d => line[d.category](d.datapoints));
+
+    svg.select('.notline')
+        .attr("d", tempLine(data));
+
+    // Update the tick marks
+    xAxis.ticks(Math.max(width / 75, 2));
+    tempAxis.ticks(Math.max(height / 50, 2));
+    Object.values(yAxis).forEach(axis => axis.ticks(Math.max(height / 50, 2)))
+};
+
 var prevData = [],
     prevConcentrations = [];
 
 // Create a function that takes a dataset as input and update the plot:
 export function update(id, data, cumulative) {
+    let mounted = false;
     if (data && data.length === 0) return;
     if (d3.select(`svg.${id}`).empty()) {
         mount(id, data);
+        mounted = true;
     }
+
+    function lixo(a, s) {
+        let temp = [];
+        if (a.length <= s)
+            return a;
+        for (let i = 0; i < a.length; i += (a.length / s)) {
+            temp.push(a[parseInt(i)])
+        }
+        return temp
+    }
+    data = lixo(data, 50)
 
     if (cumulative) {
         data.sort((a, b) => a - b)
@@ -211,7 +221,7 @@ export function update(id, data, cumulative) {
 
         // Format the data field
         for (let i = 1; i < data.length; i++) {
-            data[i] = {...data[i]}
+            data[i] = { ...data[i] }
             data[i]['c_score'] += data[i - 1]['c_score']
             data[i]['kwh'] += data[i - 1]['kwh']
             data[i]['cost'] += data[i - 1]['cost']
@@ -260,6 +270,14 @@ export function update(id, data, cumulative) {
         xAxisNode = svg.append("g")
             .attr("class", "x axis")
             .attr("transform", `translate(0, ${height})`)
+
+        xAxisNode.append("text")
+            .attr("class", "label")
+            .attr("y", 45)
+            .attr("x", width / 2)
+            .style("text-anchor", "beginning")
+            .style("font-size", 15)
+            .text("Time");
     }
     xAxisNode.transition()
         .duration(2000)
@@ -269,6 +287,15 @@ export function update(id, data, cumulative) {
     if (tAxisNode.empty()) {
         tAxisNode = svg.append("g")
             .attr("class", "t axis")
+
+        tAxisNode.append("text")
+            .attr("class", "label")
+            .attr("y", - 45)
+            .attr("x", - height / 2 + 45)
+            .attr("transform", "rotate(-90)")
+            .style("text-anchor", "beginning")
+            .style("font-size", 15)
+            .text("Temperature");
     }
     tAxisNode.transition()
         .duration(2000)
@@ -277,24 +304,31 @@ export function update(id, data, cumulative) {
 
     productCategories.forEach(d => {
         let yAxisNode = svg.select(`.y.axis.${d}`)
+
+        const meta = {
+            'c_score': { title: "Confort Score", pad: -50 },
+            'kwh': { title: "Energy", pad: -30 },
+            'cost': { title: "Custo", pad: -30 },
+        }
+
         if (yAxisNode.empty()) {
             yAxisNode = svg.append("g")
                 .attr("class", `y axis ${d}`)
                 .attr("transform", `translate(${width}, 0)`)
             // .style("opacity", d === currCategory ? 1 : 0)
-
+            yAxisNode.append("text")
+                .attr("class", "label")
+                .attr("y", -45)
+                .attr("x", height / 2 + meta[d].pad)
+                .attr("transform", "rotate(90)")
+                .style("text-anchor", "beginning")
+                .style("font-size", 15)
+                .text(meta[d].title);
         }
         yAxisNode.transition()
             .duration(2000)
             .call(yAxis[d])
     })
-    // .append("text")
-    // .attr("class", "label")
-    // .attr("y", 6)
-    // .attr("dy", ".71em")
-    // .attr("dx", ".71em")
-    // .style("text-anchor", "beginning")
-    // .text("Product Concentration");
 
     // Place the lines
     let tempLineNode = svg.select(".notcategory")
@@ -346,4 +380,10 @@ export function update(id, data, cumulative) {
 
     prevData = data;
     prevConcentrations = concentrations;
+
+
+    // Call the resize function
+    if (mounted)
+        resize(id, data)
+    // pointerleft();
 }

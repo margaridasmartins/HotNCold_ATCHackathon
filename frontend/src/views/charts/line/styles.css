@@ -8,6 +8,10 @@
     text-shadow: 0 1px #00000066;
 }
 
+#line-chart .axis .label {
+    fill: var(--normal-color);
+}
+
 #line-chart .axis.c_score path,
 #line-chart .axis.c_score line,
 #line-chart .axis.c_score text {
@@ -18,6 +22,10 @@
     stroke: var(--c_score-color);
 }
 
+
+#line-chart .axis.c_score .label {
+    fill: var(--c_score-color);
+}
 #line-chart .axis.kwh path,
 #line-chart .axis.kwh line,
 #line-chart .axis.kwh text {
@@ -28,6 +36,10 @@
     stroke: var(--kwh-color);
 }
 
+
+#line-chart .axis.kwh .label {
+    fill: var(--kwh-color);
+}
 #line-chart .axis.cost path,
 #line-chart .axis.cost line,
 #line-chart .axis.cost text {
@@ -36,4 +48,8 @@
 
 #line-chart .category.cost .line {
     stroke: var(--cost-color);
+}
+
+#line-chart .axis.cost .label {
+    fill: var(--cost-color);
 }
