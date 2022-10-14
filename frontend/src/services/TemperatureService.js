@@ -1,8 +1,8 @@
-
+import {BASE_TEMP_API_URL} from "../Config"
 
 class TemperatureService {
     get_locations() {
-        return fetch(`http://localhost:8002/api/v1/locations`, {
+        return fetch(`${BASE_TEMP_API_URL}locations`, {
             method: 'GET',
             mode: 'cors',
         })

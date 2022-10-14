@@ -1,0 +1,27 @@
+version: "3"
+services:
+  api:
+    image: hotncold/main_api:latest
+    ports: 
+      - 8000:8000
+    environment:
+      - TEMP_API=temp
+      - BILL_API=billing
+  billing:
+    image: hotncold/billing_api:latest
+    ports:
+      - 8001:8001
+  temp:
+    image: hotncold/temp_api:latest
+    ports:
+      - 8002:8002
+  frontend:
+    image: hotncold/frontend:latest
+    links:
+      - api
+      - billing
+      - temp
+    environment:
+      - HOST_NAME=46.101.92.174
+    ports:
+      - 80:80

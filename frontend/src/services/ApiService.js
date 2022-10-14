@@ -1,3 +1,5 @@
+import {BASE_API_URL} from "../Config"
+
 class ApiService {
     constructor() {
         this.get_data = this.get_data.bind(this);
@@ -7,7 +9,7 @@ class ApiService {
     }
 
     get_data(location, start, end, supplier, tariff) {
-        return fetch(`http://localhost:8000/api/v1/optimize/?city=${location}&start=${start}&end=${end}&supplier=${supplier}&tariff=${tariff}`, {
+        return fetch(`${BASE_API_URL}optimize/?city=${location}&start=${start}&end=${end}&supplier=${supplier}&tariff=${tariff}`, {
             method: 'GET',
             mode: 'cors',
         })
@@ -63,6 +65,7 @@ class ApiService {
             } 
         }
         return this.get_data(location, start, end, supplier, tariff);
+
     }
 
 }
