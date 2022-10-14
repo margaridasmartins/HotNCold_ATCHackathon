@@ -1,10 +1,8 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  repository_dispatch:
+    types: [trigger-workflow-2]
 
 jobs:
 
@@ -21,7 +19,7 @@ jobs:
         logout: true
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        ref: ${{ github.event.client_payload.sha }}
     - name: Build Docker Main API image
       run: |
         git pull        
@@ -53,6 +51,6 @@ jobs:
       with:
         token: ${{ secrets.REPO_GHA_PAT }}
         repository: ${{ github.repository }}
-        event-type: trigger-workflow-2
+        event-type: trigger-workflow-3
         client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
 

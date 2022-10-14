@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   repository_dispatch:
-    types: [trigger-workflow-2]
+    types: [trigger-workflow-3]
 
 jobs:
 
