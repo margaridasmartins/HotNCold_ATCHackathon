@@ -12,7 +12,7 @@ else:
 if os.getenv("BILL_API"):
     bill_api = os.getenv("BILL_API")
 else:
-    bill_api = os.getenv("BILL_API")
+    bill_api = "localhost"
 
 
 def get_prices(supplier: str, tariff: str) -> list:
