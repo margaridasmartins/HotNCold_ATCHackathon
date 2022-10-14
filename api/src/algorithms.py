@@ -88,6 +88,8 @@ def min_cost(prices, start, end, city= 1040200, dead_hours=[]):
 
     # iterate through day-by-day measurements
     for temps in all_temps:
+        modes = ["E" for _ in range(24)]
+
         extra_cost = []
 
         for i, t in enumerate(temps):
@@ -96,23 +98,35 @@ def min_cost(prices, start, end, city= 1040200, dead_hours=[]):
 
                 kw_confort = [temp["kw"] for temp in config["CONFORT"]["temp_intervals"] if temp["min_temp"] <= t[0] < temp["max_temp"]][0]
 
-                extra_cost.append((i, (kw_confort-kw_eco)*prices[i], t[0]))
+                extra_cost.append((i, (kw_confort-kw_eco)*prices[i]))
 
             else: # dead hours are always ECO
                 kw_eco = [temp["kw"] for temp in config["ECO"]["temp_intervals"] if temp["min_temp"] <= t[0] < temp["max_temp"]][0]
 
                 data.append({'time':t[1], 'mode': 'ECO', 'c_score': config["ECO"]["confort_score"], 'kwh': kw_eco, 'cost': kw_eco*prices[i], 'temperature': t[0]})
 
-        extra_cost = sorted(extra_cost, key = lambda x: (x[1], -x[2]))
+        extra_cost = sorted(extra_cost, key = lambda x: x[1])
 
         num_hours_confort = ceil((124 - 24*config["ECO"]["confort_score"])/(config["CONFORT"]["confort_score"]-config["ECO"]["confort_score"]))
 
-        indexes = [x[0] for x in extra_cost[0:num_hours_confort]]
+        costs = sorted(list(set([x[1] for x in extra_cost])))
+
+        for cost in costs:
+            indexes = [x[0] for x in extra_cost if x[1]==cost]
+
+            for index in indexes:
+                if index > 0 and index < 23 and modes[index-1] == "E" and modes[index+1] == "E":
+                    modes[index] = "C"
+                    num_hours_confort -=1
+
+                elif len(indexes)-indexes.index(index) <= num_hours_confort:
+                    modes[index] = "C"
+                    num_hours_confort -=1
 
         # iterate through measurements of a day
         for i, t in enumerate(temps):
             if int(t[1][11:13])  not in dead_hours:
-                if i in indexes:
+                if modes[i]=="C":
                     kw_confort = [temp["kw"] for temp in config["CONFORT"]["temp_intervals"] if temp["min_temp"] <= t[0] < temp["max_temp"]][0]
 
                     data.append({'time':t[1], 'mode': 'CONFORT', 'c_score': config["CONFORT"]["confort_score"], 'kwh': kw_confort, 'cost': kw_confort*prices[i], 'temperature': t[0]})
