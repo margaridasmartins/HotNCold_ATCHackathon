@@ -25,4 +25,11 @@ The application is available at: TBA
 ![Hot N Cold Arquitecture](https://github.com/margaridasmartins/HotNCold_ATCHackathon/blob/main/assets/arch_final.png)
 
 ## Instalation
-TODO
+### Requirements
+- [docker](https://docs.docker.com/get-docker/)
+- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) (or download .zip)
+
+### Deploying
+- git clone git@github.com:margaridasmartins/HotNCold_ATCHackathon.git __OR__ download .zip and unzip
+- cd HotNCold_ATCHackaton
+- docker-compose up
