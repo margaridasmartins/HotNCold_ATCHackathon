@@ -28,5 +28,6 @@ th:hover {
 }
 
 .selected {
-    background-color: lightgreen;
+    background-color: lightcoral;
+    color: white;
 }

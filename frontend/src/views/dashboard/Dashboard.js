@@ -26,6 +26,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CChartLine, CChartPie } from '@coreui/react-chartjs'
 import { getStyle, hexToRgba } from '@coreui/utils'
 import CIcon from '@coreui/icons-react'
+import DeadHourTable from '../widgets/DeadHourTable';
 import {
   cibCcAmex,
   cibCcApplePay,
@@ -52,10 +53,15 @@ import {
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 import billingservice from "../../services/BillingService.js";
 import temperatureservice from "../../services/TemperatureService.js";
-
+import ApiService from 'src/services/ApiService';
 import { LineChart } from "src/views/charts"
 
 import { useStore } from "src/store/useStore"
+
+
+function convertDateToFormat(d) {
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+}
 
 const Dashboard = () => {
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
@@ -70,31 +76,26 @@ const Dashboard = () => {
     { label: "Tri-horária", value: "T" },
   ]);
 
-  const [location, setLocation] = React.useState("0");
-  const [supplier, setSupplier] = React.useState("");
-  const [tariff, setTariff] = React.useState("");
-  const [piedata, setPiedata] = React.useState(null);
+  const 
+    location = useStore(state => state.location),
+    supplier = useStore(state => state.supplier),
+    tariff = useStore(state => state.tariff),
+    timePeriod = useStore(state => state.timePeriod),
+    hours = useStore(state => state.hours);
 
+  // const [location, setLocation] = React.useState("0");
+  // const [supplier, setSupplier] = React.useState("");
+  // const [tariff, setTariff] = React.useState("");
+  // const [deadHours, setDeadHours] = React.useState([]);
+  const [piedata, setPiedata] = React.useState(null);
+  
   React.useEffect(() => {
     temperatureservice.get_locations()
       .then((res) => res.json())
       .then((res) => setLocations(res.data))
-
-    const loc = localStorage.getItem("location");
-    const sup = localStorage.getItem("supplier");
-    const tar = localStorage.getItem("tariff");
-
-    if (loc) setLocation(loc);
-
-    if (sup) setSupplier(sup);
-
-    if (tar) setTariff(tar);
-
   }, []);
 
   React.useEffect(() => {
-    localStorage.setItem("location", location);
-    useStore.getState().setLocation(location);
     billingservice.get_suppliers()
       .then((res) => res.json())
       .then((res) => {
@@ -106,8 +107,6 @@ const Dashboard = () => {
   }, [location]);
 
   React.useEffect(() => {
-    localStorage.setItem("supplier", supplier);
-    useStore.getState().setSupplier(supplier);
     if (supplier) {
       billingservice.get_tariffs(supplier)
         .then((res) => res.json())
@@ -117,10 +116,27 @@ const Dashboard = () => {
     }
   }, [supplier]);
 
+  // React.useEffect(() => {
+  //   useStore.getState().setTariff(tariff);
+  // }, [tariff]);
+
+  // React.useEffect(() => {
+  //   useStore.getState().setHours(deadHours);
+  // }, [deadHours]);
+
   React.useEffect(() => {
-    localStorage.setItem("tariff", tariff);
-    useStore.getState().setTariff(tariff);
-  }, [tariff]);
+    if (!(location && tariff && timePeriod && supplier)) return;
+    const [start, end] = timePeriod;
+    ApiService.deadhours(location, convertDateToFormat(start), convertDateToFormat(end), supplier, tariff, hours)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.data && res.data.length === 0) {
+          return;
+        }
+        console.log(res.data)
+        return useStore.getState().setData(res.data)
+      })
+  }, [location, tariff, timePeriod, supplier, hours])
 
   const changePie = (data) => {
     // TODO: call this to match the request 
@@ -153,7 +169,9 @@ const Dashboard = () => {
     );
   }
 
-
+  const updateDeadHours = (a) => {
+    useStore.getState().setHours(a);
+  }
   const getTotal = (piedata, value) => {
     let sum = piedata.datasets[0].data.reduce(
       (a, b) => a + b,
@@ -186,42 +204,48 @@ const Dashboard = () => {
 
   return (
     <>
-      <div style={{ margin: 20 }} >
-        <CFormSelect
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          options={
-            [{ label: "Select location", value: 0 }, ...locations]
-          }
-        />
-        {location != 0 ?
-          <CFormSelect
-            value={supplier}
-            onChange={(e) => setSupplier(e.target.value)}
-            options={
-              [{ label: "Select supplier", value: "" }, ...suppliers]
-            }
-          />
-          : <></>}
-        {supplier ?
-          <CFormSelect
-            value={tariff}
-            onChange={(e) => setTariff(e.target.value)}
-            options={
-              [{ label: "Select tariff", value: "" }, ...tariffs]
-            }
-          />
-          : <></>}
-      </div>
+      <div className='d-flex flex-row justify-content-around'>
+        <div style={{ margin: 20 }} >
+          <h3>Choose preferences</h3>
+          <div className='d-flex flex-row'>
+            <CFormSelect
+              style={{ margin: "0px 10px" }}
+              value={location}
+              onChange={(e) => useStore.getState().setLocation(e.target.value)}
+              options={
+                [{ label: "Select location", value: 0 }, ...locations]
+              }
+            />
+            <CFormSelect
+              style={{ margin: "0px 10px" }}
+              value={supplier}
+              onChange={(e) => useStore.getState().setSupplier(e.target.value)}
+              options={
+                [{ label: "Select supplier", value: "" }, ...suppliers]
+              }
+            />
+            <CFormSelect
+              style={{ margin: "0px 10px" }}
+              value={tariff}
+              onChange={(e) => useStore.getState().setTariff(e.target.value)}
+              options={
+                [{ label: "Select tariff", value: "" }, ...tariffs]
+              }
+            />
+          </div>
 
+        </div>
+        <div style={{ margin: 20 }}>
+          <h3>Choose dead hours</h3>
+          <DeadHourTable updateList={updateDeadHours} />
+        </div>
+      </div>
       {
-        location != 0 && supplier != "" && tariff != ""
-          ?
+        location && supplier && tariff &&
           <WidgetsDropdown location={location} supplier={supplier} tariff={tariff} />
-          : <h1>Please choose your preferences.</h1>
       }
 
-      <LineChart />
+      <LineChart showTimePeriod />
 
       {piedata ?
         <Pie plugins={[ChartDataLabels]} options={pieChartOptions} data={piedata} style={{ maxHeight: 330, textAlign: "center", paddingTop: 15 }} />

@@ -3,7 +3,6 @@ import './deadHourTable.css';
 
 let isClicked = false;
 export default function DeadHourTable({ updateList }) {
-    console.log(updateList)
 
     const [cellStates, setCellStates] = React.useState(new Array(24).fill(false));
 
@@ -12,19 +11,16 @@ export default function DeadHourTable({ updateList }) {
         setCellStates((s) => {
             let temp = s;
             temp[i] = !temp[i];
-            console.log(temp[i])
             return [...temp]
         });
     }
 
     const selectCell = (i) => {
         if (isClicked) {
-            console.log(i)
 
             setCellStates((s) => {
                 let temp = s;
                 temp[i] = !temp[i];
-                console.log(temp[i])
                 return  [...temp]
             });
         }

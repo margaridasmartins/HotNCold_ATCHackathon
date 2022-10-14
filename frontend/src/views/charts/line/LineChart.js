@@ -8,7 +8,7 @@ import apiService from "src/services/ApiService"
 import { update } from "./chart"
 import './styles.css'
 
-const LineChart = () => {
+const LineChart = ({showTimePeriod}) => {
     const [cumulative, setCumulative] = useState('independent');
     const timePeriod = useStore(state => state.timePeriod)
     const data = useStore(state => state.data),
@@ -20,38 +20,37 @@ const LineChart = () => {
     const fetchData = (timePeriod) => {
         useStore.getState().setTimePeriod(timePeriod)
         
-        function convertDateToFormat(d) {
-            return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-        }
-        const [start, end] = timePeriod;
+        // function convertDateToFormat(d) {
+        //     return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+        // }
+        // const [start, end] = timePeriod;
 
-        apiService.get_data(location, convertDateToFormat(start), convertDateToFormat(end), supplier, tariff)
-            .then((res) => res.json())
-            .then((res) => {
-                console.log(res)
-                if (res.data && res.data.length === 0) return;
-                useStore.getState().setData(res.data);
-                useStore.getState().setTimePeriod(timePeriod);
-            })
-            .catch(console.error);
+        // apiService.deadhours(location, convertDateToFormat(start), convertDateToFormat(end), supplier, tariff)
+        //     .then((res) => res.json())
+        //     .then((res) => {
+        //         console.log(res)
+        //         if (res.data && res.data.length === 0) return;
+        //         useStore.getState().setData(res.data);
+        //         useStore.getState().setTimePeriod(timePeriod);
+        //     })
+        //     .catch(console.error);
     }
 
     useEffect(() => {
-        console.log(cumulative)
         update("line-chart", data, cumulative === 'cumulative');
     }, [data, cumulative])
 
 
     return (
-        <CCard className="mb-4">
-            <CCardHeader>Line Chart</CCardHeader>
+        <CCard className="mb-4 w-100">
+            <CCardHeader>Heat Pump Summary</CCardHeader>
             <CCardBody>
                 <div className="d-flex flex-row justify-content-between">
 
-                    <DateRangePicker
+                    {showTimePeriod && <DateRangePicker
                         value={timePeriod}
                         onChange={(v) => fetchData(v)}
-                    />
+                    />}
                     <CFormSelect
                         style={{ width: 250 }}
                         value={cumulative}

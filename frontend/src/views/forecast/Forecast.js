@@ -8,11 +8,13 @@ import {
 
 import temperatureservice from 'src/services/TemperatureService';
 import billingservice from 'src/services/BillingService';
+import { LineChart } from "src/views/charts"
+
 
 export default function Forecast() {
 
     const [days, setDays] = React.useState([]);
-    const [selected, setSelected] = React.useState();
+    const [selected, setSelected] = React.useState(0);
     const [deadHours, setDeadHours] = React.useState(Array(24).fill(false));
 
 
@@ -74,12 +76,8 @@ export default function Forecast() {
         localStorage.setItem("tariff", tariff);
     }, [tariff]);
 
-
-
-
     const updateDeadHours = (a) => {
         setDeadHours(a);
-        console.log(a)
         ApiService.deadhours(1040200, "", "", "EDP", "S", a)
             .then((res) => res.json())
             .then((res) => console.log(res))
@@ -87,7 +85,6 @@ export default function Forecast() {
 
     const changeDay = (i) => {
         setSelected(i);
-        console.log(selected)
     }
 
     function convertDateToFormat(d) {
@@ -132,50 +129,54 @@ export default function Forecast() {
 
     return (
         <div >
-            <div style={{ margin: 20 }} >
-                <CFormSelect
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    options={
-                        [{ label: "Select location", value: 0 }, ...locations]
-                    }
-                />
-                {location != 0 ?
-                    <CFormSelect
-                        value={supplier}
-                        onChange={(e) => setSupplier(e.target.value)}
-                        options={
-                            [{ label: "Select supplier", value: "" }, ...suppliers]
-                        }
-                    />
-                    : <></>}
-                {supplier ?
-                    <CFormSelect
-                        value={tariff}
-                        onChange={(e) => setTariff(e.target.value)}
-                        options={
-                            [{ label: "Select tariff", value: "" }, ...tariffs]
-                        }
-                    />
-                    : <></>}
-                {
-                    location != 0 && supplier != "" && tariff != ""
-                        ?  <></> : <h1>Please choose your preferences.</h1>
-                }
-
+            <div className='d-flex flex-row justify-content-around'>
+                <div style={{ margin: 20 }} >
+                    <h3>Choose preferences</h3>
+                    <div className='d-flex flex-row'>
+                        <CFormSelect
+                            style={{margin: "0px 10px"}}
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            options={
+                                [{ label: "Select location", value: 0 }, ...locations]
+                            }
+                        />
+                        <CFormSelect
+                            style={{margin:  "0px 10px"}}
+                            value={supplier}
+                            onChange={(e) => setSupplier(e.target.value)}
+                            options={
+                                [{ label: "Select supplier", value: "" }, ...suppliers]
+                            }
+                        />
+                        <CFormSelect
+                            style={{margin: "0px 10px"}}
+                            value={tariff}
+                            onChange={(e) => setTariff(e.target.value)}
+                            options={
+                                [{ label: "Select tariff", value: "" }, ...tariffs]
+                            }
+                        />
+                    </div>
+                </div>
+                <div style={{ margin: 20 }}>
+                    <h3>Choose dead hours</h3>
+                    <DeadHourTable updateList={updateDeadHours} />
+                </div>
             </div>
 
+            <div className='d-flex flex-row w-100'>
+                <div style={{ width: 300, marginRight: 20 }}>
+                    {days.map((d, i) => {
+                        return (<div onClick={() => { changeDay(i) }} key={d.date}>
+                            <ForecastCard date={d.date} cost={d.cost} kwh={d.kwh} temperature={d.temperature} selected={selected == i} />
+                        </div>)
+                    })}
 
-            {days.map((d, i) => {
-                return (<div onClick={() => { changeDay(i) }} key={d.date}>
-                    <ForecastCard date={d.date} cost={d.cost} kwh={d.kwh} temperature={d.temperature} selected={selected == i} />
-                </div>)
-            })}
-
-            <div>
-                <h3>Choose Dead Hours</h3>
-                <DeadHourTable updateList={updateDeadHours} />
+                </div>
+                <LineChart />
             </div>
+
         </div>
     )
 }

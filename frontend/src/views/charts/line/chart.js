@@ -40,7 +40,7 @@ export function mount(id, data) {
     // width = parseInt(parent.style("width")) - margin.left - margin.right;
     // height = parseInt(parent.style("height")) - margin.top - margin.bottom;
 
-    const pel = document.getElementById(id)
+    const pel = document.getElementById(id) // FIXME: pel is null
     width = parseInt(pel.offsetWidth) - margin.left - margin.right;
     height = parseInt(pel.offsetHeight) - margin.top - margin.bottom;
 
@@ -146,7 +146,6 @@ export function mount(id, data) {
 
 // Define responsive behavior
 function resize(id, data) {
-    console.log(currCategory)
     const pel = document.getElementById(id)
     width = parseInt(pel.offsetWidth) - margin.left - margin.right;
     height = parseInt(pel.offsetHeight) - margin.top - margin.bottom;
@@ -171,10 +170,9 @@ function resize(id, data) {
         .call(xAxis);
 
     productCategories.forEach(d => {
-        console.log(currCategory, d, d === currCategory ? 1 : 0)
         svg.select(`.y.axis.${d}`)
             .attr("transform", `translate(${width}, 0)`)
-            .style("opacity", () => { console.log("wtf", d === currCategory ? 1 : 0); return d === currCategory ? 1 : 0 })
+            .style("opacity", () => { return d === currCategory ? 1 : 0 })
             .call(yAxis[d])
     })
 
@@ -216,7 +214,6 @@ export function update(id, data, cumulative) {
     data = lixo(data, 50)
 
     if (cumulative) {
-        data.sort((a, b) => a - b)
         data = [...data]
 
         // Format the data field
@@ -234,6 +231,10 @@ export function update(id, data, cumulative) {
         const parsed = d3.isoParse(d["time"]);
         if (parsed) d["time"] = parsed
     });
+
+    data.sort((a, b) => {
+        return a.time - b.time
+    })
 
     // Reformat data to make it more copasetic for d3
     // data = An array of objects
@@ -280,7 +281,7 @@ export function update(id, data, cumulative) {
             .text("Time");
     }
     xAxisNode.transition()
-        .duration(2000)
+        .duration(800)
         .call(xAxis);
 
     let tAxisNode = svg.select(".t.axis")
@@ -298,7 +299,7 @@ export function update(id, data, cumulative) {
             .text("Temperature");
     }
     tAxisNode.transition()
-        .duration(2000)
+        .duration(800)
         .call(tempAxis);
 
 
@@ -326,7 +327,7 @@ export function update(id, data, cumulative) {
                 .text(meta[d].title);
         }
         yAxisNode.transition()
-            .duration(2000)
+            .duration(800)
             .call(yAxis[d])
     })
 
@@ -346,7 +347,7 @@ export function update(id, data, cumulative) {
         tempLineNode
             .select('path')
             .transition()
-            .duration(2000)
+            .duration(800)
             .attr("d", tempLine(data))
     }
 
@@ -357,7 +358,7 @@ export function update(id, data, cumulative) {
         .attr("class", d => `category ${d.category}`)
         .select('path')
         .transition()
-        .duration(2000)
+        .duration(800)
         .attr("d", d => {
             return line[d.category](d.datapoints)
         });
@@ -372,7 +373,7 @@ export function update(id, data, cumulative) {
         .style("stroke-width", 2)
         // .merge(products)
         .transition()
-        .duration(2000)
+        .duration(800)
         .attr("d", d => {
             return line[d.category](d.datapoints)
         });
