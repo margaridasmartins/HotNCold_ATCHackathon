@@ -1,4 +1,4 @@
-import {BASE_TEMP_API_URL} from "Config"
+import {BASE_TEMP_API_URL} from "../Config"
 
 class TemperatureService {
     get_locations() {
