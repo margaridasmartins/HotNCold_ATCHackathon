@@ -2,7 +2,7 @@
 FROM nginx:alpine
 
 #copy defaults
-COPY templates /etc/nginx/templates/
+COPY templates/default.conf.templates /etc/nginx/conf.d/default.conf
 
 # Set working directory to nginx asset directory
 WORKDIR /usr/share/nginx/html
