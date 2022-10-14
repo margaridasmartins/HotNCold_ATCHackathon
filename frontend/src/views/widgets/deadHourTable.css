@@ -1,0 +1,32 @@
+th {
+    min-width: 40px;
+    line-height: 40px;
+    font-size: 20px;
+    border-radius: 3px;
+    background-color: white;
+    color: grey;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+
+
+table {
+    border-collapse: 'separate';
+    border-spacing: '10px 4px';
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+table tr th {
+    border: 1px solid #ebedef;
+
+}
+
+th:hover {
+    transform: scale(1.2);
+}
+
+.selected {
+    background-color: lightgreen;
+}
