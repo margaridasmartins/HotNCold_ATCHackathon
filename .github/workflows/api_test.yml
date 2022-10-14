@@ -5,7 +5,9 @@ name: API Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "prod" ]
+  pull_request:
+    branches: [ "prod" ]
 
 jobs:
   build:
