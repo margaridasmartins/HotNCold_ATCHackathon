@@ -6,7 +6,7 @@ services:
       - 8000:8000
     environment:
       - TEMP_API=temp
-      - BILL_API=bill
+      - BILL_API=billing
   billing:
     image: hotncold/billing_api:latest
     ports:
