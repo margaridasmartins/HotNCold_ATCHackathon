@@ -6,10 +6,14 @@ services:
       - 8000:8000
   billing:
     image: hotncold/billing_api:latest
+    environment:
+      - BILL_API=bill
     ports:
       - 8001:8001
   temp:
     image: hotncold/temp_api:latest
+    environment:
+      - TEMP_API=temp
     ports:
       - 8002:8002
   frontend:
