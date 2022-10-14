@@ -95,8 +95,6 @@ export function build() {
                     // What are the selected boundaries?
                     extent = event.selection
 
-                    console.log(extent)
-
                     // If no selection, back to initial coordinate. Otherwise, update X axis domain
                     if (!extent) {
                         if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
@@ -120,7 +118,6 @@ export function build() {
 
                 // If user double click, reinitialize the chart
                 svg.on("dblclick", function () {
-                    console.log(d3.extent(data, function (d) { return d.date; }))
                     x.domain(d3.extent(data, function (d) { return d.date; }))
                     xAxis.transition().call(d3.axisBottom(x))
                     line

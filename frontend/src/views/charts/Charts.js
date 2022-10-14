@@ -44,7 +44,7 @@ const Charts = () => {
       </CCol>
       <CCol xs={6}>
         <CCard className="mb-4">
-          <CCardHeader>Line Chart</CCardHeader>
+          <CCardHeader>Heat Pump Summary</CCardHeader>
           <CCardBody>
             <CChartLine
               data={{

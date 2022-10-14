@@ -39,7 +39,7 @@ const WidgetsDropdown = ({ location, supplier, tariff }) => {
         fill_charts(res.data);
         useStore.getState().setData(res.data);
       });
-  }, [location, supplier, tariff]);
+  }, []);
 
 
   const fill_charts = (d) => {
