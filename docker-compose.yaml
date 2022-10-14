@@ -1,19 +1,19 @@
 version: "3"
 services:
   api:
-    image: main_api:latest
+    image: hotncold/main_api:latest
     ports: 
       - 8000:8000
   billing:
-    image: billing_api:latest
+    image: hotncold/billing_api:latest
     ports:
       - 8001:8001
   temp:
-    image: temp_api:latest
+    image: hotncold/temp_api:latest
     ports:
       - 8002:8002
   frontend:
-    image: frontend:latest
+    image: hotncold/frontend:latest
     links:
       - api
       - billing

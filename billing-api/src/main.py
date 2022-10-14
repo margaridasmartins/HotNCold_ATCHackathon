@@ -17,7 +17,7 @@ app = FastAPI()
 supliers = ["EDP", "GALP", "ENDESA"] # list of available suppliers
 tariffs = [{"label": "Simple", "value": "S"}, {"label": "Bi-Hour", "value": "B"}, {"label": "Tri-Hour", "value": "T"}] # list of available tariffs
 
-@app.get("/api/v1/billing")
+@app.get("/api/v2/billing")
 def get_billing(
         supplier:  str,
         tariff: str = "S",
@@ -63,7 +63,7 @@ def get_billing(
         return create_response(status_code=400, message="Bad arguments")
     
 
-@app.get("/api/v1/suppliers")
+@app.get("/api/v2/suppliers")
 def get_suppliers() -> JSONResponse:
     """
     Endpoint ``/suppliers`` that accepts the method GET. Returns a list of available suppliers
@@ -79,7 +79,7 @@ def get_suppliers() -> JSONResponse:
         print(e)
         return create_response(status_code=400, message="Bad arguments")
 
-@app.get("/api/v1/tariffs/{supplier}")
+@app.get("/api/v2/tariffs/{supplier}")
 def get_tariffs(
         supplier: str
     ) -> JSONResponse:
