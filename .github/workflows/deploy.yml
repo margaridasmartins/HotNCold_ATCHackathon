@@ -16,3 +16,6 @@ jobs:
         ref: ${{ github.event.client_payload.sha }}
     - name: Deploy docker-compose
       run: docker-compose up
+    - uses: r-lib/actions/setup-r@master
+    - uses: r-lib/actions/setup-pandoc@master
+     
