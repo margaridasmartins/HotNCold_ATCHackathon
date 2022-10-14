@@ -30,6 +30,10 @@ The application is available at: TBA
 - [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) (or download .zip)
 
 ### Deploying
-- git clone git@github.com:margaridasmartins/HotNCold_ATCHackathon.git __OR__ download .zip and unzip
-- cd HotNCold_ATCHackaton
-- docker-compose up
+```example
+git clone git@github.com:margaridasmartins/HotNCold_ATCHackathon.git
+
+cd HotNCold_ATCHackaton
+
+docker-compose up
+```
