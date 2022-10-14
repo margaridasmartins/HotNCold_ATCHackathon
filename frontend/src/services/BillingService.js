@@ -1,4 +1,4 @@
-import {BASE_BILL_API_URL} from "config"
+import {BASE_BILL_API_URL} from "Config"
 
 class BillingService {
     get_suppliers() {

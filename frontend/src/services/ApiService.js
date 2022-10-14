@@ -1,4 +1,4 @@
-import {BASE_API_URL} from "config"
+import {BASE_API_URL} from "Config"
 
 class ApiService {
     constructor() {
