@@ -116,14 +116,6 @@ const Dashboard = () => {
     }
   }, [supplier]);
 
-  // React.useEffect(() => {
-  //   useStore.getState().setTariff(tariff);
-  // }, [tariff]);
-
-  // React.useEffect(() => {
-  //   useStore.getState().setHours(deadHours);
-  // }, [deadHours]);
-
   React.useEffect(() => {
     if (!(location && tariff && timePeriod && supplier)) return;
     const [start, end] = timePeriod;
@@ -133,7 +125,6 @@ const Dashboard = () => {
         if (res.data && res.data.length === 0) {
           return;
         }
-        console.log(res.data)
         return useStore.getState().setData(res.data)
       })
   }, [location, tariff, timePeriod, supplier, hours])

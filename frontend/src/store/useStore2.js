@@ -4,11 +4,10 @@ import { combine } from "zustand/middleware";
 export const useStore2 = create(combine(
     {
         data: [],
-        currCategory: 'c_score',
         timePeriod: [new Date("2021-12-31T00:00:00"), new Date("2021-12-31T00:00:00")],
-        location: localStorage.getItem("location"),
-        supplier: localStorage.getItem("supplier"),
-        tariff: localStorage.getItem("tariff"),
+        location: localStorage.getItem("location2"),
+        supplier: localStorage.getItem("supplier2"),
+        tariff: localStorage.getItem("tariff2"),
         hours: [],
     },
     (set) => ({
@@ -19,23 +18,19 @@ export const useStore2 = create(combine(
 
             return set(() => ({ timePeriod }))
         },
-        setCurrCategory: (currCategory) => {
-            return set(() => ({ currCategory }))
-        },
         setLocation: (location) => {
-            localStorage.setItem("location", location)
+            localStorage.setItem("location2", location)
             return set(() => ({ location }))
         },
         setSupplier: (supplier) => {
-            localStorage.setItem("supplier", supplier)
+            localStorage.setItem("supplier2", supplier)
             return set(() => ({ supplier }))
         },
         setTariff: (tariff) => {
-            localStorage.setItem("tariff", tariff)
+            localStorage.setItem("tariff2", tariff)
             return set(() => ({ tariff }))
         },
         setHours: (hours) => {
-            console.log("ljkdsshjfds" , hours)
             return set(() => ({ hours: [...hours] }))
         }
     })

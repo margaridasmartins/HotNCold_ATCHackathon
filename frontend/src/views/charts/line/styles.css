@@ -1,55 +1,55 @@
-#line-chart .axis path,
-#line-chart .axis line,
-#line-chart .axis text {
+ .axis path,
+ .axis line,
+ .axis text {
     color: var(--normal-color);
 }
 
-#line-chart .axis text {
+ .axis text {
     text-shadow: 0 1px #00000066;
 }
 
-#line-chart .axis .label {
+ .axis .label {
     fill: var(--normal-color);
 }
 
-#line-chart .axis.c_score path,
-#line-chart .axis.c_score line,
-#line-chart .axis.c_score text {
+ .axis.c_score path,
+ .axis.c_score line,
+ .axis.c_score text {
     color: var(--c_score-color);
 }
 
-#line-chart .category.c_score .line {
+ .category.c_score .line {
     stroke: var(--c_score-color);
 }
 
 
-#line-chart .axis.c_score .label {
+ .axis.c_score .label {
     fill: var(--c_score-color);
 }
-#line-chart .axis.kwh path,
-#line-chart .axis.kwh line,
-#line-chart .axis.kwh text {
+ .axis.kwh path,
+ .axis.kwh line,
+ .axis.kwh text {
     color: var(--kwh-color);
 }
 
-#line-chart .category.kwh .line {
+ .category.kwh .line {
     stroke: var(--kwh-color);
 }
 
 
-#line-chart .axis.kwh .label {
+ .axis.kwh .label {
     fill: var(--kwh-color);
 }
-#line-chart .axis.cost path,
-#line-chart .axis.cost line,
-#line-chart .axis.cost text {
+ .axis.cost path,
+ .axis.cost line,
+ .axis.cost text {
     color: var(--cost-color);
 }
 
-#line-chart .category.cost .line {
+ .category.cost .line {
     stroke: var(--cost-color);
 }
 
-#line-chart .axis.cost .label {
+ .axis.cost .label {
     fill: var(--cost-color);
 }
