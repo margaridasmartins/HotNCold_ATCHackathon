@@ -14,8 +14,9 @@ jobs:
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.event.client_payload.sha }}
-    - name: Deploy docker-compose
+    - name: Down old docker-compose
+      run: docker-compose down
+    - name: Up new docker-compose
       run: docker-compose up
     - uses: r-lib/actions/setup-r@master
-    - uses: r-lib/actions/setup-pandoc@master
-     
+    - uses: r-lib/actions/setup-pandoc@master 

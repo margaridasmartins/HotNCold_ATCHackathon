@@ -21,7 +21,8 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         logout: true
     - name: Build Docker Main API image
-      run: |       
+      run: |
+        git pull        
         cd api
         docker build . --file Dockerfile --tag hotncold/main_api:latest
     - name: Build Docker Billing API image
