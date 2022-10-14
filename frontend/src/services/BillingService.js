@@ -1,15 +1,15 @@
-
+import {BASE_BILL_API_URL} from "config"
 
 class BillingService {
     get_suppliers() {
-        return fetch(`http://localhost:8001/api/v1/suppliers`, {
+        return fetch(`${BASE_BILL_API_URL}suppliers`, {
             method: 'GET',
             mode: 'cors',
         })
     }
 
     get_tariffs(supplier) {
-        return fetch(`http://localhost:8001/api/v1/tariffs/${supplier}`, {
+        return fetch(`${BASE_BILL_API_URL}tariffs/${supplier}`, {
             method: 'GET',
             mode: 'cors',
         })

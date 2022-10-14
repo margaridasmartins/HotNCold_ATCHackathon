@@ -1,3 +1,5 @@
+import {BASE_API_URL} from "config"
+
 class ApiService {
     constructor() {
         this.get_data = this.get_data.bind(this);
@@ -7,7 +9,7 @@ class ApiService {
     }
 
     get_data(location, start, end, supplier, tariff) {
-        return fetch(`http://localhost:8000/api/v1/optimize/?city=${location}&start=${start}&end=${end}&supplier=${supplier}&tariff=${tariff}`, {
+        return fetch(`${BASE_API_URL}optimize/?city=${location}&start=${start}&end=${end}&supplier=${supplier}&tariff=${tariff}`, {
             method: 'GET',
             mode: 'cors',
         })
@@ -53,7 +55,7 @@ class ApiService {
 
     deadhours(location, start, end, supplier, tariff, hours) {
         start = "2021-12-01T00:00:00"; end = "2021-12-02T00:00:00";
-        return fetch(`http://localhost:8000/api/v1/deadhours/?city=${location}&start=${start}&end=${end}&supplier=${supplier}&tariff=${tariff}&hours=${hours.map((d,i) => {return d ? i : null}).filter((d) => d != null).join("&hours=")}`, {
+        return fetch(`${BASE_API_URL}deadhours/?city=${location}&start=${start}&end=${end}&supplier=${supplier}&tariff=${tariff}&hours=${hours.map((d,i) => {return d ? i : null}).filter((d) => d != null).join("&hours=")}`, {
             method: 'GET',
             mode: 'cors',
         })
