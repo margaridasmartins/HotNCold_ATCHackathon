@@ -18,7 +18,6 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,

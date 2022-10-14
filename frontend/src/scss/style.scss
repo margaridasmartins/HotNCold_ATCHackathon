@@ -15,3 +15,13 @@ $enable-rtl: true;
 
 // If you want to add custom CSS you can put it here.
 @import "custom";
+
+
+:root {
+    --cost-color: #EDC949;
+    --kwh-color: #E15759;
+    --c_score-color: #59A14F;
+    --temperature-color: #76B7B2;
+    --mode-color: #59A14F;
+    --normal-color: #BAB0AB;
+}
