@@ -18,5 +18,5 @@ jobs:
       run: docker-compose down
     - name: Up new docker-compose
       run: docker-compose up -d
-    - uses: r-lib/actions/setup-r@master
-    - uses: r-lib/actions/setup-pandoc@master 
+    # - uses: r-lib/actions/setup-r@master
+    # - uses: r-lib/actions/setup-pandoc@master 
