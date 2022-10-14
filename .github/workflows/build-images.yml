@@ -41,9 +41,6 @@ jobs:
         echo "REACT_APP_API_URL = 'http://46.101.92.174/api'" > .env
         yarn install && yarn build
         docker build . --file Dockerfile -t hotncold/frontend:latest
-        
-        cd frontend
-        docker build . --file Dockerfile --tag frontend:latest
     - name: Push images to registry
       run: |
         docker push hotncold/main_api:latest
