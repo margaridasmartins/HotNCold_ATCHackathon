@@ -103,8 +103,6 @@ def min_cost(prices, start, end, city= 1040200, dead_hours=[]):
 
         costs = sorted(list(set([(x[1], x[2]) for x in extra_cost])), key = lambda x: (x[1], x[0]))
 
-        print(costs)
-
         for cost in costs:
             indexes = [x[0] for x in extra_cost if x[1]==cost[0] and x[2]== cost[1]]
 
