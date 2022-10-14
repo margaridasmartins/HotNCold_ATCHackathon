@@ -16,7 +16,11 @@ jobs:
         ref: ${{ github.event.client_payload.sha }}
     - name: Down old docker-compose
       run: docker-compose down
+    - name: Delete unused images
+      run: |
+        docker rmi -f $(docker images -aq)
+        docker rm -vf $(docker ps -aq)
     - name: Up new docker-compose
-      run: docker-compose up
-    - uses: r-lib/actions/setup-r@master
-    - uses: r-lib/actions/setup-pandoc@master 
+      run: docker-compose up -d
+    # - uses: r-lib/actions/setup-r@master
+    # - uses: r-lib/actions/setup-pandoc@master 
