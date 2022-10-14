@@ -1,0 +1,24 @@
+version: "3"
+services:
+  api:
+    image: main_api:latest
+    ports: 
+      - 8000:8000
+  billing:
+    image: billing_api:latest
+    ports:
+      - 8001:8001
+  temp:
+    image: temp_api:latest
+    ports:
+      - 8002:8002
+  frontend:
+    image: frontend:latest
+    links:
+      - api
+      - billing
+      - temp
+    environment:
+      - HOST_NAME=46.101.92.174
+    ports:
+      - 80:80
