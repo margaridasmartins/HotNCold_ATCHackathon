@@ -4,75 +4,67 @@ import { DateRangePicker } from 'rsuite';
 
 
 import { useStore } from "src/store/useStore"
+import { useStore2 } from "src/store/useStore2"
+
 import apiService from "src/services/ApiService"
 import { update } from "./chart"
+import { update as update2 } from "./chart2"
+
 import './styles.css'
 
-const LineChart = () => {
+const LineChart = ({ showTimePeriod, showNothing, showData2, cumulativeOut = null }) => {
     const [cumulative, setCumulative] = useState('independent');
     const timePeriod = useStore(state => state.timePeriod)
     const data = useStore(state => state.data),
-        location = useStore(state => state.location),
-        supplier = useStore(state => state.supplier),
-        tariff = useStore(state => state.tariff),
+        data2 = useStore2(state => state.data),
         currCategory = useStore(state => state.currCategory);
 
     const fetchData = (timePeriod) => {
         useStore.getState().setTimePeriod(timePeriod)
-        
-        function convertDateToFormat(d) {
-            return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-        }
-        const [start, end] = timePeriod;
-
-        apiService.get_data(location, convertDateToFormat(start), convertDateToFormat(end), supplier, tariff)
-            .then((res) => res.json())
-            .then((res) => {
-                console.log(res)
-                if (res.data && res.data.length === 0) return;
-                useStore.getState().setData(res.data);
-                useStore.getState().setTimePeriod(timePeriod);
-            })
-            .catch(console.error);
     }
 
     useEffect(() => {
-        console.log(cumulative)
-        update("line-chart", data, cumulative === 'cumulative');
-    }, [data, cumulative])
+        console.log(showData2, cumulativeOut, (cumulativeOut ? cumulativeOut : cumulative))
 
+        const up = showData2 ? update2 : update;
+
+        up(showData2 ? "line-chart2" : "line-chart", showData2 ? data2 : data,
+            (cumulativeOut ? cumulativeOut : cumulative) === 'cumulative');
+    }, [data, data2, cumulative, cumulativeOut])
 
     return (
-        <CCard className="mb-4">
-            <CCardHeader>Line Chart</CCardHeader>
+        <CCard className="mb-4 w-100">
+            <CCardHeader>Heat Pump Summary</CCardHeader>
             <CCardBody>
-                <div className="d-flex flex-row justify-content-between">
+                {!showNothing &&
+                    <div className="d-flex flex-row justify-content-between">
 
-                    <DateRangePicker
-                        value={timePeriod}
-                        onChange={(v) => fetchData(v)}
-                    />
-                    <CFormSelect
-                        style={{ width: 250 }}
-                        value={cumulative}
-                        onChange={(e) => { setCumulative(e.target.value) }}
-                        options={[
-                            { label: 'Cumulative Data', value: 'cumulative' },
-                            { label: 'Independent Data', value: 'independent' },
-                        ]}
-                    />
-                    <CFormSelect
-                        style={{ width: 250 }}
-                        value={currCategory}
-                        onChange={(e) => { useStore.getState().setCurrCategory(e.target.value) }}
-                        options={[
-                            { label: 'Confort Score', value: 'c_score' },
-                            { label: 'Cost', value: 'cost' },
-                            { label: 'Energy', value: 'kwh' }
-                        ]}
-                    />
-                </div>
-                <div id="line-chart" style={{ height: '500px' }}></div>
+                        {showTimePeriod && <DateRangePicker
+                            value={timePeriod}
+                            onChange={(v) => fetchData(v)}
+                        />}
+                        <CFormSelect
+                            style={{ width: 250 }}
+                            value={cumulative}
+                            onChange={(e) => { setCumulative(e.target.value) }}
+                            options={[
+                                { label: 'Cumulative Data', value: 'cumulative' },
+                                { label: 'Independent Data', value: 'independent' },
+                            ]}
+                        />
+                        <CFormSelect
+                            style={{ width: 250 }}
+                            value={currCategory}
+                            onChange={(e) => { useStore.getState().setCurrCategory(e.target.value) }}
+                            options={[
+                                { label: 'Confort Score', value: 'c_score' },
+                                { label: 'Cost', value: 'cost' },
+                                { label: 'Energy', value: 'kwh' }
+                            ]}
+                        />
+                    </div>
+                }
+                <div id={showData2 ? "line-chart2" : "line-chart"} style={{ height: '500px' }}></div>
             </CCardBody>
         </CCard>
     )
