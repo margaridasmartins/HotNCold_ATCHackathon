@@ -10,7 +10,7 @@ def test_locations_endpoint():
     When he requests the available locations
     The the API should return all the locations labels and values
     """
-    response = client.get("/api/v1/locations")
+    response = client.get("/api/v3/locations")
     data = response.json()
     data = data["data"]
 
@@ -24,7 +24,7 @@ def test_temperatures_valid_id():
     When he requests the temperatures for a valid location
     The the API should return all the hourly temperatures for that location
     """
-    response = client.get("/api/v1/temperatures/1040200?start=2021-12-01T00:00:00&end=2021-12-02T00:00:00")
+    response = client.get("/api/v3/temperatures/1040200?start=2021-12-01T00:00:00&end=2021-12-02T00:00:00")
     data = response.json()
     data = data["data"]
 
@@ -39,5 +39,5 @@ def test_temperatures_invalid_id():
     When he requests the temperatures for a unknown location id
     The the API should respond with a 404 status code
     """
-    response = client.get("/api/v1/temperatures/999999?start=2021-12-01T00:00:00&end=2022-01-01T00:00:00")
+    response = client.get("/api/v3/temperatures/999999?start=2021-12-01T00:00:00&end=2022-01-01T00:00:00")
     assert response.status_code == 404
