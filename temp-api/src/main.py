@@ -68,7 +68,7 @@ def temperatures(
             if f[:7] == id:
                 with open(data_path+f) as temp_file:
                     data = json.loads(temp_file.read())
-                    data = [(d['airTemperature'], d['time']) for d in data if start <= datetime.fromisoformat(d['time'][:-6]) <= end]
+                    data = [(d['airTemperature'], d['time']) for d in data if start <= datetime.fromisoformat(d['time'][:-6]) < end]
                     return  create_response(status_code=200, data=data)
 
         return create_response(status_code=404,message="Location does not exist")

@@ -59,6 +59,11 @@ cd src
 python -m uvicorn main:app --reload
 ```
 
+4. Testing
+```
+pytest
+```
+
 ## Docker Instalation
 
 1. Build Image

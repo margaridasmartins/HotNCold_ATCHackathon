@@ -1,6 +1,10 @@
 import React from 'react'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
+const Forecast = React.lazy(() => import('./views/forecast/Forecast'))
+const Analyzer = React.lazy(() => import('./views/analyzer/Analyzer'))
+
+
 
 // Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
@@ -45,6 +49,8 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/forecast', name: 'Forecast', element: Forecast },
+  { path: '/analyzer', name: 'Analyzer', element: Analyzer },
   { path: '/base', name: 'Base', element: Cards, exact: true },
   { path: '/base/accordion', name: 'Accordion', element: Accordion },
   { path: '/base/breadcrumbs', name: 'Breadcrumbs', element: Breadcrumbs },

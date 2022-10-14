@@ -50,12 +50,12 @@ def get_data(start: datetime, end: datetime, city: int = 1040200) -> list:
     if datetime.today().date() == start.date() or datetime.today().date() == end.date():
         try:
             r = requests.get(f"https://api.ipma.pt/public-data/forecast/aggregate/{city}.json")
-            data = [d for d in r.json() if 'tMed' in d.keys() and start.date() < datetime.fromisoformat(d['dataPrev'][:-6]).date() <= end.date()]
+            data = [d for d in r.json() if 'tMed' in d.keys() and start.date() <= datetime.fromisoformat(d['dataPrev'][:-6]).date() <= end.date()]
                 
             data = [(float(d['tMed']), d['dataPrev']) for d in data]
 
             # fix missing temperatures 00:00 and 01:00
-            data = [(data[0][0]+0.2, data[0][1][0:12]+"0"+data[0][1][13:]), (data[0][0]+0.1, data[0][1][0:12]+"1"+data[0][1][13:])] + data
+            # data = [(data[0][0]+0.2, data[0][1][0:12]+"0"+data[0][1][13:]), (data[0][0]+0.1, data[0][1][0:12]+"1"+data[0][1][13:])] + data
 
             data = [data[i:i+24] for i in range(0,len(data),24)]
 
