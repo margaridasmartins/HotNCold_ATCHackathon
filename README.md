@@ -2,7 +2,7 @@
 
 Hot N Cold is our solution for the "Gestão de aquecimento residencial inteligente" challenge purposed by Bosch at the 1st edition of Aveiro Tech City Hackathon. It consists on a web application that allows its users to visualize and costumize the behaviour of an heat pump. The purpose is to allow for a more efficient use, keeping the costs low while mantaining a minimum of confort.
 
-The application is available at: TBA
+The application is available at: [http://46.101.92.174](http://46.101.92.174/)
 
 ## Features
 - Three different heat pump controll algorithms:
@@ -23,6 +23,14 @@ The application is available at: TBA
 
 ## Arquitecture
 ![Hot N Cold Arquitecture](https://github.com/margaridasmartins/HotNCold_ATCHackathon/blob/main/assets/arch_final.png)
+
+## Grafic interface
+### Main Dashboard
+![Hot N Cold Arquitecture](https://github.com/margaridasmartins/HotNCold_ATCHackathon/blob/main/assets/main.png)
+### Forecast Dashboard
+![Hot N Cold Arquitecture](https://github.com/margaridasmartins/HotNCold_ATCHackathon/blob/main/assets/fore.png)
+### Analyzer Dashboard
+![Hot N Cold Arquitecture](https://github.com/margaridasmartins/HotNCold_ATCHackathon/blob/main/assets/ana.png)
 
 ## Instalation
 ### Requirements
