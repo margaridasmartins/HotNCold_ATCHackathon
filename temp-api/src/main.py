@@ -19,7 +19,7 @@ app = FastAPI()
 
 data_path= "../data/" # data temperature files
 
-@app.get("/api/v1/locations")
+@app.get("/api/v3/locations")
 def locations()-> JSONResponse:
     """
     Endpoint ``/locations`` that accepts the method GET. Returns the list of locations and its id
@@ -42,7 +42,7 @@ def locations()-> JSONResponse:
         print(e)
         return create_response(status_code=400, message="Sorry something went wrong")
 
-@app.get("/api/v1/temperatures/{id}")
+@app.get("/api/v3/temperatures/{id}")
 def temperatures(
         id,
         start: datetime,

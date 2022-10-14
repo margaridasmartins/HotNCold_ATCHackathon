@@ -37,7 +37,7 @@
     
     Example
     ```
-    /api/v1/deadhours?start=2021-12-01T00:00:00&end=2022-01-01T00:00:00&supplier=EDP&tariff=B&hours=10,&hours=11,&hours=12,&hours=13,&hours=14
+    /api/v1/deadhours?start=2021-12-01T00:00:00&end=2022-01-01T00:00:00&supplier=EDP&tariff=B&hours=10&hours=11&hours=12&hours=13&hours=14
     ```
 
 ## Local Instalation

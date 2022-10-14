@@ -8,6 +8,8 @@ COPY ./requirements.txt /backend/requirements.txt
 
 RUN pip install  --upgrade -r /backend/requirements.txt
 
+COPY config.json /backend/config.json
+
 WORKDIR /backend/src
 
 COPY src/ .

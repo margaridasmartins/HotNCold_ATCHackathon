@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  repository_dispatch:
+    types: [trigger-workflow-3]
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.client_payload.sha }}
+    - name: Down old docker-compose
+      run: docker-compose down
+    - name: Delete unused images
+      run: |
+        docker rmi -f $(docker images -aq)
+        docker rm -vf $(docker ps -aq)
+    - name: Up new docker-compose
+      run: docker-compose up -d
+    # - uses: r-lib/actions/setup-r@master
+    # - uses: r-lib/actions/setup-pandoc@master 
