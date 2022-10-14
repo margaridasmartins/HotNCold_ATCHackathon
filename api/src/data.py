@@ -17,7 +17,7 @@ def get_prices(supplier: str, tariff: str) -> list:
     ---------
         response:  list with 24 float values each representing a price at the given hour
     """
-    r = requests.get(f"http://localhost:8001/api/v1/billing?supplier={supplier}&tariff={tariff}")
+    r = requests.get(f"http://localhost:8001/api/v2/billing?supplier={supplier}&tariff={tariff}")
     return r.json()["data"]
 
 
@@ -67,7 +67,7 @@ def get_data(start: datetime, end: datetime, city: int = 1040200) -> list:
             exit(1)
     else:
         try:
-           r=requests.get(f"http://localhost:8002/api/v1/temperatures/{city}?start={start}&end={end}")
+           r=requests.get(f"http://localhost:8002/api/v3/temperatures/{city}?start={start}&end={end}")
            r= r.json()
            data = [r["data"][i:i+24] for i in range(0,len(r["data"]),24)]
            return data

@@ -22,19 +22,19 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    # - name: Build Docker Main API image
-    #   run: |
-    #     git pull        
-    #     cd api
-    #     docker build . --file Dockerfile --tag hotncold/main_api:latest
-    # - name: Build Docker Billing API image
-    #   run: |
-    #     cd billing-api
-    #     docker build . --file Dockerfile --tag hotncold/billing_api:latest
-    # - name: Build Docker Temp API image
-    #   run: |
-    #     cd temp-api
-    #     docker build . --file Dockerfile --tag hotncold/temp_api:latest
+    - name: Build Docker Main API image
+      run: |
+        git pull        
+        cd api
+        docker build . --file Dockerfile --tag hotncold/main_api:latest
+    - name: Build Docker Billing API image
+      run: |
+        cd billing-api
+        docker build . --file Dockerfile --tag hotncold/billing_api:latest
+    - name: Build Docker Temp API image
+      run: |
+        cd temp-api
+        docker build . --file Dockerfile --tag hotncold/temp_api:latest
     - name: Build Docker Frontend image
       run: |
         cd frontend/
@@ -42,10 +42,9 @@ jobs:
         yarn install && yarn build
         docker build . --file Dockerfile -t hotncold/frontend:latest
     - name: Push images to registry
-      # run: |
-      #   docker push hotncold/main_api:latest
-      #   docker push hotncold/billing_api:latest
-      #   docker push hotncold/temp_api:latest      
       run: |
+        docker push hotncold/main_api:latest
+        docker push hotncold/billing_api:latest
+        docker push hotncold/temp_api:latest      
         docker push hotncold/frontend:latest
 
