@@ -19,11 +19,6 @@ jobs:
         username: "hotncold"
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         logout: true
-#     - name: Docker login
-#       env:
-#         DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-#       run: |
-#         docker login --username hotncold --password $DOCKERHUB_TOKEN
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
@@ -42,6 +37,11 @@ jobs:
         docker build . --file Dockerfile --tag temp_api:latest
     - name: Build Docker Frontend image
       run: |
+        cd frontend/
+        echo "REACT_APP_API_URL = 'http://46.101.92.174/api'" > .env
+        yarn install && yarn build
+        docker build . --file Dockerfile -t hotncold/frontend:latest
+        
         cd frontend
         docker build . --file Dockerfile --tag frontend:latest
     - name: Push images to registry
