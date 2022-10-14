@@ -35,7 +35,6 @@ export const useStore = create(combine(
             return set(() => ({ tariff }))
         },
         setHours: (hours) => {
-            console.log("ljkdsshjfds" , hours)
             return set(() => ({ hours: [...hours] }))
         }
     })

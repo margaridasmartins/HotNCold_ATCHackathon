@@ -43,16 +43,15 @@ class ApiService {
         return this.get_data(location, "2021-12-01T00:00:00", "2021-12-31T00:00:00", supplier, tariff);
     }
 
-    forecast(location, supplier, tariff) {
+    forecast(location, supplier, tariff, hours) {
         let curr_date = new Date();
         const start = convertDateToFormat(curr_date);
         curr_date.setDate(curr_date.getDate() + 2);
         const end = convertDateToFormat(curr_date);
-        return this.get_data(location, start, end, supplier, tariff);
+        return this.deadhours(location, start, end, supplier, tariff, hours);
     }
 
     deadhours(location, start, end, supplier, tariff, hours) {
-        console.log("olah ldsjf ", hours)
         if (hours?.length > 0) {
             let temp = hours.map((d, i) => { return d ? i : null }).filter((d) => d != null);
             if(temp.length > 0) {
