@@ -15,6 +15,15 @@ class ApiService {
         // TODO: hardcoded
         return this.get_data(location, "2021-12-01T00:00:00", "2021-12-02T00:00:00", supplier, tariff);
     }
+
+    forecast(location, supplier, tariff) {
+        let curr_date = new Date();
+        const start = convertDateToFormat(curr_date);
+        curr_date.setDate(curr_date.getDate() + 2);
+        const end = convertDateToFormat(curr_date);
+        return this.get_data(location, start, end, supplier, tariff);
+    }
+
 }
 
 function convertDateToFormat(d) {

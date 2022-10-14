@@ -23,7 +23,27 @@ const _nav = [
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     badge: {
       color: 'info',
-      text: 'NEW',
+      text: '',
+    },
+  },
+  {
+    component: CNavItem,
+    name: 'Forecast',
+    to: '/forecast',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+      text: '',
+    },
+  },
+  {
+    component: CNavItem,
+    name: 'Analyzer',
+    to: '/analyzer',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+      text: '',
     },
   },
   {
