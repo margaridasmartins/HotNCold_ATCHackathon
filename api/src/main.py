@@ -1,5 +1,6 @@
 import logging
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List
 from fastapi import Query
@@ -9,7 +10,7 @@ import os
 from utils import create_response
 
 from data import get_prices
-from algorithms import dead_hours, min_cost, best_ratio
+from algorithms import min_cost, best_ratio
 
 # Logger
 logging.basicConfig(
@@ -19,6 +20,13 @@ logging.basicConfig(
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/v1/optimize")
 def simple_request(
@@ -59,6 +67,7 @@ def simple_request(
         print(e)
         return create_response(status_code=400, message="Bad arguments")
 
+
 @app.get("/api/v1/bestratio")
 def simple_request(
         start:  datetime.datetime,
@@ -98,6 +107,7 @@ def simple_request(
         print(e)
         return create_response(status_code=400, message="Bad arguments")
 
+
 @app.get("/api/v1/deadhours")
 def deadhours_request(
         start: datetime.datetime,
@@ -135,11 +145,9 @@ def deadhours_request(
             return create_response(status_code=400, message="Wrong billing type")
         
 
-        return create_response(status_code=200, data=dead_hours( prices, start, end, hours, city))
+        return create_response(status_code=200, data=min_cost(prices, start, end, city, hours))
         
     except BaseException as e:
         logging.debug(e)
         print(e)
         return create_response(status_code=400, message="Bad arguments")
-
-

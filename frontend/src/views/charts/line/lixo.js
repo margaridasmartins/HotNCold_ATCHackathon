@@ -36,8 +36,6 @@ export function build() {
     { time: "9", valueA: "9", valueB: "18", valueC: "1" },
     { time: "10", valueA: "11", valueB: "13", valueC: "1" }]
 
-    //Read the data
-    console.log("lixo")
 
     // List of groups (here I have one group per column)
     const allGroup = ["valueA", "valueB", "valueC"]

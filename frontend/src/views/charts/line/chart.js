@@ -1,21 +1,29 @@
 
 import * as d3 from "d3"
+import { useStore } from "src/store/useStore";
 import "src/utils/resizeListener"
 
-
-var svg, concentrations, productCategories;
+// debugger;
+var svg, parent, concentrations, productCategories;
 var xScale, tempScale, yScale, xAxis, tempAxis, yAxis;
 var width, height;
-var currCategory, hoverCategory;
+var currCategory = useStore.getState().currCategory, hoverCategory;
 var line, tempLine;
 
 export function mount(id, data) {
+    const unsub = useStore.subscribe(
+        (s) => {
+            currCategory = s.currCategory;
+            resize()
+        },
+        (state) => state.currCategory,
+    )
 
-    var parent = d3.select(`#${id}`);
+    parent = d3.select(`#${id}`);
     if (parent.empty()) throw new Error(`Element with ID ${id} not found`);
 
     parent.select(`svg.${id}`).remove()
-    var parent = parent
+    parent = parent
         .append("svg")
         .attr("class", `${id} h-100 w-100`)
         .style("-webkit-tap-highlight-color", "transparent")
@@ -27,8 +35,13 @@ export function mount(id, data) {
 
     // Define margins
     const margin = { top: 20, right: 50, bottom: 30, left: 50 };
-    width = parseInt(parent.style("width")) - margin.left - margin.right;
-    height = parseInt(parent.style("height")) - margin.top - margin.bottom;
+    // console.log(parent, parent.style("width"))
+    // width = parseInt(parent.style("width")) - margin.left - margin.right;
+    // height = parseInt(parent.style("height")) - margin.top - margin.bottom;
+
+    const pel = document.getElementById(id)
+    width = parseInt(pel.offsetWidth) - margin.left - margin.right;
+    height = parseInt(pel.offsetHeight) - margin.top - margin.bottom;
 
     // Add clip
     parent.append("defs").append("clipPath")
@@ -60,8 +73,6 @@ export function mount(id, data) {
     yAxis = productCategories.reduce((acc, key) => (
         acc[key] = d3.axisRight(yScale[key]), acc), {})
 
-    currCategory = productCategories[0];
-
     // Define lines
 
     tempLine = d3.line()
@@ -76,14 +87,8 @@ export function mount(id, data) {
             .curve(d3.curveBasis), acc), {})
 
 
-
-    // console.log(JSON.stringify(data, null, 2)) // to view the structure
-
-    update(data);
-
     function click(event) {
-        currCategory = hoverCategory;
-        resize()
+        useStore.getState().setCurrCategory(hoverCategory);
     }
 
 
@@ -91,19 +96,16 @@ export function mount(id, data) {
         let [xm, ym] = d3.pointer(event);
         [xm, ym] = [xm - margin.left, ym - margin.top]
 
-        // console.log(xm, ym, xScale(lixo), yScale(0.30555555555555536))
-
-        const c = d3.map(concentrations, ({ category, datapoints }) => ({
+        const c = d3.map(concentrations.filter(({ category }) => category !== currCategory), ({ category, datapoints }) => ({
             category,
             least: d3.least(datapoints, x => Math.hypot(xScale(x.time) - xm, yScale[category](x.concentration) - ym))
         }))
-        // console.log(c)
         const cc = d3.least(c, ({ category, least }) => Math.hypot(xScale(least.time) - xm, yScale[category](least.concentration) - ym))
 
         hoverCategory = cc.category;
 
         d3.selectAll(".category")
-            .style("opacity", d => [currCategory, hoverCategory].includes(d.category) ? 1 : 0.5)
+            .style("opacity", d => [currCategory, hoverCategory].includes(d.category) ? 1 : 0.4)
             .filter(d => d.category === hoverCategory)
             .raise();
 
@@ -120,7 +122,7 @@ export function mount(id, data) {
 
     function pointerleft() {
         d3.selectAll(".category")
-            .style("opacity", d => d.category === currCategory ? 1 : 0.5)
+            .style("opacity", d => d.category === currCategory ? 1 : 0.3)
             .filter(d => d.category === currCategory)
             .raise();
 
@@ -134,13 +136,19 @@ export function mount(id, data) {
 
     // Define responsive behavior
     function resize() {
-        width = parseInt(parent.style("width")) - margin.left - margin.right;
-        height = parseInt(parent.style("height")) - margin.top - margin.bottom;
+        const pel = document.getElementById(id)
+        width = parseInt(pel.offsetWidth) - margin.left - margin.right;
+        height = parseInt(pel.offsetHeight) - margin.top - margin.bottom;
 
         // Update the range of the scale with new width/height
         xScale.range([0, width]);
         tempScale.range([height, 0])
         Object.values(yScale).forEach(scale => scale.range([height, 0]))
+
+        parent.select("defs").select("clipPath")
+            .select("rect")
+            .attr("width", width)
+            .attr("height", height)
 
         parent
             .attr("width", width + margin.left + margin.right)
@@ -163,8 +171,8 @@ export function mount(id, data) {
             .style("stroke-dasharray", d => d.category === currCategory ? null : "3,3")
             .attr("d", d => line[d.category](d.datapoints));
 
-        svg.selectAll('.notline')
-            .attr("d", d => tempLine(data));
+        svg.select('.notline')
+            .attr("d", tempLine(data));
 
         // Update the tick marks
         xAxis.ticks(Math.max(width / 75, 2));
@@ -179,6 +187,7 @@ export function mount(id, data) {
 
     // Call the resize function
     resize()
+    pointerleft();
 
     return (function () {
         // Remove the listener
@@ -190,8 +199,25 @@ var prevData = [],
     prevConcentrations = [];
 
 // Create a function that takes a dataset as input and update the plot:
-export function update(data) {
-    console.log("lkjd")
+export function update(id, data, cumulative) {
+    if (data && data.length === 0) return;
+    if (d3.select(`svg.${id}`).empty()) {
+        mount(id, data);
+    }
+
+    if (cumulative) {
+        data.sort((a, b) => a - b)
+        data = [...data]
+
+        // Format the data field
+        for (let i = 1; i < data.length; i++) {
+            data[i] = {...data[i]}
+            data[i]['c_score'] += data[i - 1]['c_score']
+            data[i]['kwh'] += data[i - 1]['kwh']
+            data[i]['cost'] += data[i - 1]['cost']
+        }
+    }
+
 
     // Format the data field
     data.forEach(function (d) {
@@ -208,22 +234,16 @@ export function update(data) {
             return { time: d["time"], concentration: +d[category] }
         })
     }))
-    console.log(JSON.stringify(concentrations, null, 2)) // to view the structure
 
-
-    if (prevData.length < data.length) {
+    if (true) {
         // Update line before domain update
         svg.selectAll(".category")
             .data(concentrations)
             .select('path')
-            .transition()
-            .duration(2000)
-            .attr("d", d => line[d.category](d.datapoints));
+            .attr("d", d => line[d.category](d.datapoints))
 
         svg.select(".notcategory")
             .select('path')
-            .transition()
-            .duration(2000)
             .attr("d", tempLine(data))
     }
 
@@ -231,11 +251,11 @@ export function update(data) {
     xScale.domain(d3.extent(data, d => d["time"]));
     tempScale.domain(d3.extent(data, d => d["temperature"]));
     Object.values(yScale).forEach((scale, index) =>
-        scale.domain([0, d3.max(concentrations[index].datapoints, d => d.concentration)*1.1]));
 
+        scale.domain([0, d3.max(concentrations[index].datapoints, d => d.concentration) * 1.1]));
 
     // Place the axes on the chart
-    var xAxisNode = svg.select(".x.axis")
+    let xAxisNode = svg.select(".x.axis")
     if (xAxisNode.empty()) {
         xAxisNode = svg.append("g")
             .attr("class", "x axis")
@@ -245,7 +265,7 @@ export function update(data) {
         .duration(2000)
         .call(xAxis);
 
-    var tAxisNode = svg.select(".t.axis")
+    let tAxisNode = svg.select(".t.axis")
     if (tAxisNode.empty()) {
         tAxisNode = svg.append("g")
             .attr("class", "t axis")
@@ -253,6 +273,7 @@ export function update(data) {
     tAxisNode.transition()
         .duration(2000)
         .call(tempAxis);
+
 
     productCategories.forEach(d => {
         let yAxisNode = svg.select(`.y.axis.${d}`)
@@ -276,9 +297,7 @@ export function update(data) {
     // .text("Product Concentration");
 
     // Place the lines
-
     let tempLineNode = svg.select(".notcategory")
-
     if (tempLineNode.empty()) {
         svg.append("g")
             .attr("class", "notcategory temperature")
@@ -287,7 +306,7 @@ export function update(data) {
             .attr("d", tempLine(data))
             .attr("fill", "none")
             .attr("class", "notline")
-            .attr("stroke", "#99999966")
+            .attr("stroke", "var(--normal-color)")
             .style("stroke-width", 2)
     } else {
         tempLineNode
@@ -301,10 +320,13 @@ export function update(data) {
         .data(concentrations)
 
     products
+        .attr("class", d => `category ${d.category}`)
         .select('path')
         .transition()
         .duration(2000)
-        .attr("d", d => line[d.category](d.datapoints));
+        .attr("d", d => {
+            return line[d.category](d.datapoints)
+        });
 
     products
         .enter().append("g")
@@ -314,34 +336,13 @@ export function update(data) {
         .attr("fill", "none")
         .attr("class", "line")
         .style("stroke-width", 2)
-        .merge(products)
+        // .merge(products)
         .transition()
         .duration(2000)
-        .attr("d", d => line[d.category](d.datapoints));
+        .attr("d", d => {
+            return line[d.category](d.datapoints)
+        });
 
-    //-----------------------
-
-    // // create the Y axis
-    // svg.selectAll(".y.axis")
-    //     .transition()
-    //     .duration(2000)
-    //     .call(yAxis);
-
-    // Create a update selection: bind to the new data
-    // var u = svg.selectAll(".lineTest")
-    //     .data([data], function (d) { return d.ser1 });
-
-    // // Updata the line
-    // u
-    //     .enter()
-    //     .append("path")
-    //     .attr("class", "lineTest")
-    //     .merge(u)
-    //     .transition()
-    //     .duration(2000)
-    //     .attr("d", d3.line()
-    //         .x(function (d) { return x(d.ser1); })
-    //         .y(function (d) { return y(d.ser2); }))
 
     prevData = data;
     prevConcentrations = concentrations;
