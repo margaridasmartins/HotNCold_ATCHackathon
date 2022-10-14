@@ -10,7 +10,7 @@ def test_billing_endpoint_simple_tariff():
     When he requests the billing for a simple tariff
     Then all hourly prices should be the same
     """
-    response = client.get("/api/v1/billing?supplier=EDP&tariff=S")
+    response = client.get("/api/v2/billing?supplier=EDP&tariff=S")
     data = response.json()
     data = data["data"]
 
@@ -24,7 +24,7 @@ def test_billing_endpoint_bihour_tariff():
     When he requests the billing for a bi-hour tariff
     Then there should be two different hourly prices 
     """
-    response = client.get("/api/v1/billing?supplier=EDP&tariff=B")
+    response = client.get("/api/v2/billing?supplier=EDP&tariff=B")
     data = response.json()
     data = data["data"]
 
@@ -39,7 +39,7 @@ def test_billing_endpoint_trihour_tariff():
     When he requests the billing for a tri-hour tariff
     Then there should be three different hourly prices 
     """
-    response = client.get("/api/v1/billing?supplier=EDP&tariff=T")
+    response = client.get("/api/v2/billing?supplier=EDP&tariff=T")
     data = response.json()
     data = data["data"]
 
@@ -55,7 +55,7 @@ def test_suppliers_endpoint():
     When he requests the available energy suppliers
     The the API should return a list with all the suppliers available
     """
-    response = client.get("/api/v1/suppliers")
+    response = client.get("/api/v2/suppliers")
     data = response.json()
     data = data["data"]
 
@@ -69,7 +69,7 @@ def test_tariffs_valid_supplier():
     When he requests the tariffs types for  a valid supplier
     The the API should return all available tariff types for the given supplier
     """
-    response = client.get("/api/v1/tariffs/GALP")
+    response = client.get("/api/v2/tariffs/GALP")
     data = response.json()
     data = data["data"]
 
@@ -83,6 +83,6 @@ def test_temperatures_invalid_supplier():
     When he requests the tariffs types for  a invalid supplier
     The the API should respond with a 404 status code
     """
-    response = client.get("/api/v1/tariffs/INVALID")
+    response = client.get("/api/v2/tariffs/INVALID")
     assert response.status_code == 404
 

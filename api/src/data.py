@@ -1,8 +1,19 @@
+from curses.ascii import FF
 import json
+import os
 import requests
 from datetime import datetime
 
-#http://localhost:8000/api/v1/optimize?start=2021-12-01T00%3A00%3A00&end=2022-01-01T00%3A00%3A00&supplier=EDP&tariff=S
+if os.getenv("TEMP_API"):
+    temp_api = os.getenv("TEMP_API")
+else:
+    temp_api = "localhost"
+
+if os.getenv("BILL_API"):
+    bill_api = os.getenv("BILL_API")
+else:
+    bill_api = "localhost"
+
 
 def get_prices(supplier: str, tariff: str) -> list:
     """
@@ -17,7 +28,7 @@ def get_prices(supplier: str, tariff: str) -> list:
     ---------
         response:  list with 24 float values each representing a price at the given hour
     """
-    r = requests.get(f"http://localhost:8001/api/v1/billing?supplier={supplier}&tariff={tariff}")
+    r = requests.get(f"http://{bill_api}:8001/api/v2/billing?supplier={supplier}&tariff={tariff}")
     return r.json()["data"]
 
 
@@ -67,7 +78,7 @@ def get_data(start: datetime, end: datetime, city: int = 1040200) -> list:
             exit(1)
     else:
         try:
-           r=requests.get(f"http://localhost:8002/api/v1/temperatures/{city}?start={start}&end={end}")
+           r=requests.get(f"http://{temp_api}:8002/api/v3/temperatures/{city}?start={start}&end={end}")
            r= r.json()
            data = [r["data"][i:i+24] for i in range(0,len(r["data"]),24)]
            return data

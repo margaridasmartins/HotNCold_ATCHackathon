@@ -2,7 +2,7 @@
 
 ## Endpoints:
 
--  /api/v1/billing - GET
+-  /api/v2/billing - GET
     - Gives a list of prices per hour
     - Parameters:
         - Supplier - the name of the energy suplier
@@ -10,21 +10,21 @@
     
     Example
     ```
-    /api/v1/billing?supplier=EDP&tariff=B
+    /api/v2/billing?supplier=EDP&tariff=B
     ```
-- /api/v1/suppliers - GET
+- /api/v2/suppliers - GET
     - Gives a list of available suppliers
     Example
     ```
-    /api/v1/suppliers
+    /api/v2/suppliers
     ```
-- /api/v1/tariffs/{supplier} - GET
+- /api/v2/tariffs/{supplier} - GET
     - Gives a list of available tariff types for a given supplier
     - Parameters:
         - Supplier - the name of the energy suplier
     Example
     ```
-    /api/v1/tariffs/GALP
+    /api/v2/tariffs/GALP
     ```
 
 ## Local Instalation
