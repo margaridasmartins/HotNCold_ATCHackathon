@@ -15,9 +15,9 @@ import { LineChart } from "src/views/charts"
 export default function Forecast() {
 
     const [days, setDays] = React.useState([]);
+    const [myData, setMyData] = React.useState([]);
     const [selected, setSelected] = React.useState(0);
     const [deadHours, setDeadHours] = React.useState(Array(24).fill(false));
-
 
     const [locations, setLocations] = React.useState([]);
 
@@ -29,29 +29,19 @@ export default function Forecast() {
         { label: "Tri-horária", value: "T" },
     ]);
 
-    const [location, setLocation] = React.useState("0");
-    const [supplier, setSupplier] = React.useState("");
-    const [tariff, setTariff] = React.useState("");
+    const
+        location = useStore(state => state.location),
+        supplier = useStore(state => state.supplier),
+        tariff = useStore(state => state.tariff),
+        hours = useStore(state => state.hours);
 
     React.useEffect(() => {
         temperatureservice.get_locations()
             .then((res) => res.json())
             .then((res) => setLocations(res.data))
-
-        const loc = localStorage.getItem("location");
-        const sup = localStorage.getItem("supplier");
-        const tar = localStorage.getItem("tariff");
-
-        if (loc) setLocation(loc);
-
-        if (sup) setSupplier(sup);
-
-        if (tar) setTariff(tar);
-
     }, []);
 
     React.useEffect(() => {
-        localStorage.setItem("location", location);
         billingservice.get_suppliers()
             .then((res) => res.json())
             .then((res) => {
@@ -63,7 +53,6 @@ export default function Forecast() {
     }, [location]);
 
     React.useEffect(() => {
-        localStorage.setItem("supplier", supplier);
         if (supplier) {
             billingservice.get_tariffs(supplier)
                 .then((res) => res.json())
@@ -73,15 +62,8 @@ export default function Forecast() {
         }
     }, [supplier]);
 
-    React.useEffect(() => {
-        localStorage.setItem("tariff", tariff);
-    }, [tariff]);
-
     const updateDeadHours = (a) => {
-        setDeadHours(a);
-        ApiService.deadhours(1040200, "", "", "EDP", "S", a)
-            .then((res) => res.json())
-            .then((res) => console.log(res))
+        useStore.getState().setHours(a);
     }
 
     const changeDay = (i) => {
@@ -94,10 +76,11 @@ export default function Forecast() {
 
 
     React.useEffect(() => {
-        ApiService.forecast("1040200", "EDP", "S")      // FIXME: HARDCODED
+        let myData = [[], []];
+
+        ApiService.forecast(location, supplier, tariff, hours)      // FIXME: HARDCODED
             .then((res) => res.json())
             .then((res) => {
-
                 let temp = {};
                 let sums = {};
                 let curr_date = new Date();
@@ -107,6 +90,7 @@ export default function Forecast() {
                     temp[st] = [];
                     sums[st] = { date: st, cost: 0, kwh: 0, temperature: 0 };
                     for (let d = 0; d < 24; d++) {
+                        if (!(res.data[i * 24 + d])) continue;
                         temp[st].push(res.data[i * 24 + d])
                         sums[st]['cost'] += res.data[i * 24 + d]['cost'];
                         sums[st]['kwh'] += res.data[i * 24 + d]['kwh'];
@@ -117,7 +101,9 @@ export default function Forecast() {
                     sums[st]['temperature'] = Math.round(sums[st]['temperature'])
                     sums[st]['kwh'] = Math.round(sums[st]['kwh'])
 
+                    myData[i] = temp[st];
                 }
+                setMyData(myData);
 
                 setDays(
                     Object.keys(sums).map((d) => {
@@ -126,7 +112,8 @@ export default function Forecast() {
                 )
             })
 
-    }, []);
+        // FIXME: hours
+    }, [location, tariff, supplier, hours])
 
     return (
         <div >
@@ -135,25 +122,25 @@ export default function Forecast() {
                     <h3>Choose preferences</h3>
                     <div className='d-flex flex-row'>
                         <CFormSelect
-                            style={{margin: "0px 10px"}}
+                            style={{ margin: "0px 10px" }}
                             value={location}
-                            onChange={(e) => setLocation(e.target.value)}
+                            onChange={(e) => useStore.getState().setLocation(e.target.value)}
                             options={
                                 [{ label: "Select location", value: 0 }, ...locations]
                             }
                         />
                         <CFormSelect
-                            style={{margin:  "0px 10px"}}
+                            style={{ margin: "0px 10px" }}
                             value={supplier}
-                            onChange={(e) => setSupplier(e.target.value)}
+                            onChange={(e) => useStore.getState().setSupplier(e.target.value)}
                             options={
                                 [{ label: "Select supplier", value: "" }, ...suppliers]
                             }
                         />
                         <CFormSelect
-                            style={{margin: "0px 10px"}}
+                            style={{ margin: "0px 10px" }}
                             value={tariff}
-                            onChange={(e) => setTariff(e.target.value)}
+                            onChange={(e) => useStore.getState().setTariff(e.target.value)}
                             options={
                                 [{ label: "Select tariff", value: "" }, ...tariffs]
                             }
@@ -167,15 +154,16 @@ export default function Forecast() {
             </div>
 
             <div className='d-flex flex-row w-100'>
-                <div style={{ width: 300, marginRight: 20 }}>
+                <div style={{ width: 300, marginRight: 20, textAlign: "center" }}>
                     {days.map((d, i) => {
                         return (<div onClick={() => { changeDay(i) }} key={d.date}>
+                            <h5>{i === 0 ? "Tomorrow" : "Day After Tomorrow"}</h5>
                             <ForecastCard date={d.date} cost={d.cost} kwh={d.kwh} temperature={d.temperature} selected={selected == i} />
                         </div>)
                     })}
 
                 </div>
-                <LineChart />
+                <LineChart myData={myData[selected]} />
             </div>
 
         </div>
