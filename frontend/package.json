@@ -13,7 +13,7 @@
   "license": "MIT",
   "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
   "scripts": {
-    "build": "react-scripts build",
+    "build": "NODE_ENV=production react-scripts build",
     "changelog": "auto-changelog --starting-version 4.4.0 --commit-limit false --hide-credit",
     "eject": "react-scripts eject",
     "lint": "eslint \"src/**/*.js\"",
